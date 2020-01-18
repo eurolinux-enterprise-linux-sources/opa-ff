@@ -1,7 +1,7 @@
 #!/bin/bash
 # BEGIN_ICS_COPYRIGHT8 ****************************************
 # 
-# Copyright (c) 2015, Intel Corporation
+# Copyright (c) 2015-2017, Intel Corporation
 # 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -33,13 +33,22 @@
 
 # disable the specified set of hosts
 
+if [ -f /etc/opa/opafastfabric.conf ]
+then
+	. /etc/opa/opafastfabric.conf
+fi
+
+. /usr/lib/opa/tools/opafastfabric.conf.def
+
+. /usr/lib/opa/tools/ff_funcs
+
 tempfile="$(mktemp)"
 trap "rm -f $tempfile; exit 1" SIGHUP SIGTERM SIGINT
 trap "rm -f $tempfile" EXIT
 
 Usage_full()
 {
-	echo "Usage: opadisablehosts [-h hfi] [-p port] reason host" >&2
+	echo "Usage: opadisablehosts [-h hfi] [-p port] reason host ..." >&2
 	echo "              or" >&2
 	echo "       opadisablehosts --help" >&2
 	echo " " >&2
@@ -76,7 +85,7 @@ Usage_full()
 
 Usage()
 {
-	echo "Usage: opadisablehosts [-h hfi] [-p port] reason host" >&2
+	echo "Usage: opadisablehosts [-h hfi] [-p port] reason host ..." >&2
 	echo "              or" >&2
 	echo "       opadisablehosts --help" >&2
 	echo " " >&2

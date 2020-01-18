@@ -1,7 +1,7 @@
 #!/bin/bash
 # BEGIN_ICS_COPYRIGHT8 ****************************************
 # 
-# Copyright (c) 2015, Intel Corporation
+# Copyright (c) 2015-2017, Intel Corporation
 # 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -45,14 +45,6 @@ settl
 # One should set the targeted stack by uncommenting one of the lines below.
 export BUILD_WITH_STACK=${BUILD_WITH_STACK:-OPENIB}
 
-# A given release will be targeted for a specific version of ofed
-# however we allow build.config to override if needed
-#
-# Its also OK to leave this blank as the makefiles have 
-# defaults in them, and thus you will run with the INSTALLED OFED
-# whatever version that is... 
-#export OFED_STACK_PREFIX=${OFED_STACK_PREFIX:-/usr/ofed-1.5.2}
-
 # Simple script to perform builds for current system/OS type
 export BUILD_TARGET=${BUILD_TARGET:-`uname -m`}
 case $BUILD_TARGET in
@@ -68,6 +60,7 @@ export PRODUCT=${PRODUCT:-OPENIB_FF}
 export BUILD_TARGET_OS_VERSION=${BUILD_TARGET_OS_VERSION:-`uname -r`}
 setver $BUILD_TARGET_OS_VENDOR $BUILD_TARGET_OS_VERSION
 
+MODULEVERSION=`$TL_DIR/MakeTools/convert_releasetag.pl $RELEASE_TAG`
 RELEASE_STRING=IntelOPA-Tools-FF.$BUILD_TARGET_OS_ID.$MODULEVERSION
 echo "stage.OPENIB_FF.$BUILD_CONFIG/$BUILD_TARGET_OS_VENDOR/$BUILD_TARGET/$RELEASE_STRING" > $1/RELEASE_PATH
 echo "../bin/$BUILD_TARGET/$BUILD_PLATFORM_OS_VENDOR.$BUILD_PLATFORM_OS_VENDOR_VERSION/lib/$BUILD_CONFIG/" > $1/LIB_PATH

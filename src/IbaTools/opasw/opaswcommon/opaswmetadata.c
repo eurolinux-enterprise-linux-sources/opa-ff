@@ -1,6 +1,6 @@
 /* BEGIN_ICS_COPYRIGHT7 ****************************************
 
-Copyright (c) 2015, Intel Corporation
+Copyright (c) 2015-2017, Intel Corporation
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -9,7 +9,7 @@ modification, are permitted provided that the following conditions are met:
       this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
-     documentation and/or other materials provided with the distribution.
+      documentation and/or other materials provided with the distribution.
     * Neither the name of Intel Corporation nor the names of its contributors
       may be used to endorse or promote products derived from this software
       without specific prior written permission.
@@ -35,8 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <limits.h>
 
 #include "iba/ib_types.h"
-#include "iba/ib_sm.h"
-#include "iba/ib_pm.h"
+#include "iba/ib_sm_priv.h"
 #include "iba/ib_helper.h"
 #include <iba/ibt.h>
 #include "opamgt_sa_priv.h"
@@ -134,7 +133,7 @@ table_meta_data_t portMetaData[] =
 	/* 33 */	{12,		192,		1,			DT_INTVAL,			"TX_PRESET_IDX_ACTIVE_EQ"},
 	/* 34 */	{12,		204,		1,			DT_INTVAL,			"RX_PRESET_IDX"},
 	/* 35 */	{1,		216,		1,			DT_INTVAL,			"SIDEBAND_CREDIT_RETURN"},
-	/* 36 */	{0,		0,		1,			DT_INTVAL,			"RESERVED36"},
+	/* 36 */	{8,		78,		1,			DT_INTVAL,			"CHANNEL_BASE"},
 	/* 37 */	{4,		128,		1,			DT_INTVAL,			"LINK_WIDTH_DOWNGRADE_SUPPORTED"},
 	/* 38 */	{0,		0,		1,			DT_INTVAL,			"RESERVED38"},
 	/* 39 */	{1,		74,		1,			DT_INTVAL,			"QSFP_PWRCLASS4_INHIBIT_RXCDR"},
@@ -396,6 +395,49 @@ FSTATUS getNodeDescription(struct omgt_port *port, IB_PATH_RECORD *path, uint16 
 	free(parsedDataTable);
 	return(status);
 }
+
+FSTATUS getFmPushButtonState(struct omgt_port *port, IB_PATH_RECORD *path, uint16 sessionID, uint32 *state)
+{
+        FSTATUS                                         status = FSUCCESS;
+        uint8                                           *p;
+        uint8                                           memoryData[200];
+        opasw_ini_descriptor_get_t      tableDescriptors;
+        table_parsed_data_t                     *parsedDataTable;
+        VENDOR_MAD                                      mad;
+        int32                                           metaIndex;
+
+        status = sendIniDescriptorGetMad(port, path, &mad, sessionID, &tableDescriptors);
+        if (status != FSUCCESS) {
+                fprintf(stderr, "Error: Failed to get ini descriptors - status %d\n", status);
+                return((uint32)-1);
+        }
+
+        parsedDataTable = malloc(tableDescriptors.sysDataLen * sizeof(table_parsed_data_t));
+        if (parsedDataTable == NULL) {
+                fprintf(stderr, "Error: Failed to allocate required memory.\n");
+                return((uint32)-1);
+        }
+
+        status = sendMemAccessGetMad(port, path, &mad, sessionID, tableDescriptors.sysDataAddr, (uint8)200, memoryData);
+        if (status != FSUCCESS) {
+                fprintf(stderr, "Error: Failed to access system table memory - status %d\n", status);
+                free(parsedDataTable);
+                return((uint32)-1);
+        }
+        p = memoryData;
+        status = parseDataTable(&systemMetaData[0], p, MIN(tableDescriptors.sysMetaDataLen, systemMetaDataSize), &parsedDataTable[0], 0);
+        if (status != FSUCCESS) {
+                fprintf(stderr, "Error: Failed to parse system data table - status %d\n", status);
+                free(parsedDataTable);
+                return((uint32)-1);
+        }
+
+        metaIndex = getMetaDataIndexByField(&systemMetaData[0], MIN(tableDescriptors.sysMetaDataLen, systemMetaDataSize), "FM_PUSH_BUTTON_STATE");
+        memcpy(state, (char *)&parsedDataTable[metaIndex].val.intVal,parsedDataTable[metaIndex].lengthInBytes);
+        free(parsedDataTable);
+        return(status);
+}
+
 
 FSTATUS getGuid(struct omgt_port *port, IB_PATH_RECORD *path, uint16 sessionID, EUI64 *guid, int which)
 {

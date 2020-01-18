@@ -1,6 +1,6 @@
 /* BEGIN_ICS_COPYRIGHT7 ****************************************
 
-Copyright (c) 2015, Intel Corporation
+Copyright (c) 2015-2017, Intel Corporation
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -9,7 +9,7 @@ modification, are permitted provided that the following conditions are met:
       this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
-     documentation and/or other materials provided with the distribution.
+      documentation and/or other materials provided with the distribution.
     * Neither the name of Intel Corporation nor the names of its contributors
       may be used to endorse or promote products derived from this software
       without specific prior written permission.
@@ -41,8 +41,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <opamgt_sa_priv.h>
 #endif
 #include "ib_status.h"
-#include "stl_mad.h"
-#include "iba/stl_pa.h"
+#include "stl_mad_priv.h"
+#include "iba/stl_pa_priv.h"
 #include "opamgt_priv.h"
 #include "opamgt_pa_priv.h"
 #include "opamgt_pa.h"
@@ -66,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define					MAX_VFABRIC_NAME		64		// from fm_xml.h
 
 int						g_verbose 			= 0;
-uint32					g_nodeLid			= 0;
+STL_LID					g_nodeLid			= 0;
 uint8					g_portNumber		= 0;
 uint64					g_nodeGUID			= 0;
 char					g_nodeDesc[STL_PM_NODEDESCLEN];
@@ -97,7 +97,7 @@ struct omgt_port 		*g_portHandle		= NULL;
 typedef struct ColumnEntry_s {
 	uint64 nodeGUID;
 	char nodeDesc[64];
-	uint32 nodeLid;
+	STL_LID nodeLid;
 	uint8	portNumber;
 #if COMPUTE_DELTA
 	uint64	recentValue;
@@ -139,21 +139,31 @@ struct option options[] = {
 
 static FSTATUS opa_pa_init(uint8 hfi, uint8 port)
 {
-    FSTATUS				fstatus = FERROR;
+	FSTATUS fstatus = FERROR;
+	int pa_service_state;
 
 	// Open the port
-    struct omgt_params params = {.debug_file = (g_verbose > 3 ? stderr : NULL)};
-    if (!(omgt_open_port_by_num( &g_portHandle, (int)hfi, port, &params)) &&
-			(PACLIENT_OPERATIONAL == omgt_pa_client_connect(g_portHandle)))
-    {
-        fstatus = FSUCCESS;
-    }
-    else
-    {
-        fprintf(stderr, "%s: failed to open the port: hfi %d, port %d\n", __func__, hfi, port);
-    }
+	struct omgt_params params = {
+		.debug_file = (g_verbose > 3 ? stderr : NULL),
+		.error_file = stderr
+	};
+	fstatus = omgt_open_port_by_num(&g_portHandle, (int)hfi, port, &params);
+	if (fstatus == OMGT_STATUS_SUCCESS) {
+		fstatus = omgt_port_get_pa_service_state(g_portHandle, &pa_service_state, OMGT_REFRESH_SERVICE_BAD_STATE);
+		if (fstatus == OMGT_STATUS_SUCCESS) {
+			if (pa_service_state != OMGT_SERVICE_STATE_OPERATIONAL) {
+				fprintf(stderr, "%s: failed to connect, PA Service State is Not Operational: %s (%d)\n",
+					__func__, omgt_service_state_totext(pa_service_state), pa_service_state);
+				fstatus = FUNAVAILABLE;
+			}
+		} else {
+			fprintf(stderr, "%s: failed to get and refresh pa service state: %u\n", __func__, fstatus);
+		}
+	} else {
+		fprintf(stderr, "%s: failed to open hfi %d, port %d: %u\n", __func__, hfi, port, fstatus);
+	}
 
-    return fstatus;
+	return fstatus;
 }
 
 #if 0
@@ -176,20 +186,20 @@ static FSTATUS GetClassPortInfo(struct omgt_port *port)
 }
 #endif
 
-static FSTATUS GetPortCounters(struct omgt_port *port, uint32_t nodeLid, uint8_t portNumber, uint32_t deltaFlag, uint32_t userCntrsFlag, uint64 imageNumber, int32 imageOffset, STL_PORT_COUNTERS_DATA *pCounters)
+static FSTATUS GetPortCounters(struct omgt_port *port, STL_LID nodeLid, uint8_t portNumber, uint32_t deltaFlag, uint32_t userCntrsFlag, uint64 imageNumber, int32 imageOffset, STL_PORT_COUNTERS_DATA *pCounters)
 {
 	FSTATUS					status= FERROR;
     STL_PA_IMAGE_ID_DATA			imageId = {0};
     STL_PORT_COUNTERS_DATA		*response;
 
     if (g_verbose)
-		fprintf(stderr, "Getting Port Counters for Lid 0x%4.4x port %u...\n", nodeLid, portNumber);
+		fprintf(stderr, "Getting Port Counters for Lid 0x%8.8x port %u...\n", nodeLid, portNumber);
 	imageId.imageNumber = imageNumber;
 	imageId.imageOffset = imageOffset;
     if ((response = iba_pa_single_mad_port_counters_response_query(port, nodeLid, portNumber, deltaFlag, userCntrsFlag, &imageId)) != NULL) {
         status = FSUCCESS;
     	if (g_verbose > 2)
-			PrintStlPAPortCounters(&g_dest, 0, response, (uint32)nodeLid, (uint32)portNumber, response->flags);
+			PrintStlPAPortCounters(&g_dest, 0, response, nodeLid, (uint32)portNumber, response->flags);
 		*pCounters = *response;
     } else {
         fprintf(stderr, "Failed to receive GetPortCounters response: %s\n", iba_pa_mad_status_msg(port));
@@ -769,7 +779,7 @@ static void PrintFocusPorts(uint32 select,
 }
 #endif
 #if 0
-		PrintFunc(dest, "%*s%u:LID:0x%04x  Port:%u  Rate: %4s MTU: %5s nbrLID:0x%04x  nbrPort:%u\n",
+		PrintFunc(dest, "%*s%u:LID:0x%08x  Port:%u  Rate: %4s MTU: %5s nbrLID:0x%08x  nbrPort:%u\n",
 				indent, "", i+1, pFocusPorts[i].nodeLid, pFocusPorts[i].portNumber,
 				StlStaticRateToText(pFocusPorts[i].rate), IbMTUToText(pFocusPorts[i].mtu),
 				pFocusPorts[i].neighborLid, pFocusPorts[i].neighborPortNumber);
@@ -786,7 +796,7 @@ static void PrintFocusPorts(uint32 select,
 	PrintStlPAImageId(dest, indent, &pFocusPorts[0].imageId);
 
 
-	PrintFunc(dest, "%*s%s controlled Port Counters (%s) for LID 0x%04x, port number %u%s:\n",
+	PrintFunc(dest, "%*s%s controlled Port Counters (%s) for LID 0x%08x, port number %u%s:\n",
 				indent, "", (flags & STL_PA_PC_FLAG_USER_COUNTERS) ? "User" : "PM",
 				(flags & STL_PA_PC_FLAG_DELTA) ? "delta" : "total",
 			   	nodeLid, portNumber,
@@ -1197,7 +1207,7 @@ fail:
 #endif
 
 #if 0
-static FSTATUS GetVFPortCounters(struct omgt_port *port, uint32_t nodeLid, uint8_t portNumber, uint32_t deltaFlag, uint32_t userCntrsFlag, char *vfName, uint64 imageNumber, int32 imageOffset)
+static FSTATUS GetVFPortCounters(struct omgt_port *port, STL_LID nodeLid, uint8_t portNumber, uint32_t deltaFlag, uint32_t userCntrsFlag, char *vfName, uint64 imageNumber, int32 imageOffset)
 {
 	FSTATUS					status= FERROR;
     STL_PA_IMAGE_ID_DATA			imageId = {0};
@@ -1208,7 +1218,7 @@ static FSTATUS GetVFPortCounters(struct omgt_port *port, uint32_t nodeLid, uint8
 	imageId.imageOffset = imageOffset;
     if ((response = iba_pa_single_mad_vf_port_counters_response_query(port, nodeLid, portNumber, deltaFlag, userCntrsFlag, vfName, &imageId)) != NULL) {
         status = FSUCCESS;
-		PrintStlPAVFPortCounters(&g_dest, 0, response, (uint32)nodeLid, (uint32)portNumber, response->flags);
+		PrintStlPAVFPortCounters(&g_dest, 0, response, nodeLid, (uint32)portNumber, response->flags);
     } else {
         fprintf(stderr, "Failed to receive GetVFPortCounters response: %s\n", iba_pa_mad_status_msg(port));
     }
@@ -1412,7 +1422,7 @@ int main(int argc, char ** argv)
     int c, index;
     uint8 hfi = 0;
     uint8 port = 0;
-	uint16 temp16;
+	uint32 temp32;
 	uint8 temp8;
 	STL_PA_IMAGE_ID_DATA imageId;
 	STL_PA_IMAGE_INFO_DATA ImageInfo;
@@ -1458,11 +1468,11 @@ int main(int argc, char ** argv)
 				break;
 
 			case 'l':
-				if (FSUCCESS != StringToUint16(&temp16, optarg, NULL, 0, TRUE)) {
+				if (FSUCCESS != StringToUint32(&temp32, optarg, NULL, 0, TRUE)) {
 					fprintf(stderr, "opapaquery: Invalid Lid Number: %s\n", optarg);
 					usage();
 				}
-				g_nodeLid = (uint32)temp16;
+				g_nodeLid = (STL_LID)temp32;
 				g_gotLid = TRUE;
 				break;
 
@@ -1593,17 +1603,6 @@ int main(int argc, char ** argv)
 
 	if (g_verbose > 3)
 		set_opapaquery_debug(g_portHandle);
-
-	// Read and set the primary pa master
-    if (FSUCCESS == (fstatus = iba_pa_query_master_pm_lid(g_portHandle))) {
-        // The LID value of the Primary PM has been set in the port object as a side effect of the previous call.
-    } else {
-		if (fstatus == FUNAVAILABLE)
-			fprintf(stderr, "opapaquery: cannot communicate with PM/PA ... PM Engine not running\n");
-		else
-			fprintf(stderr, "opapaquery: failed to set master PM lid - status = %d\n", fstatus);
-        exit(-1);
-	}
 
 	ArrayInitState(&g_Columns);
 	ArrayInit(&g_Columns, 0, 50, sizeof(ColumnEntry_t), IBA_MEM_FLAG_NONE);

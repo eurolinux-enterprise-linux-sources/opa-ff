@@ -1,7 +1,7 @@
 #!/bin/bash
 # BEGIN_ICS_COPYRIGHT8 ****************************************
 # 
-# Copyright (c) 2015, Intel Corporation
+# Copyright (c) 2015-2017, Intel Corporation
 # 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -25,7 +25,7 @@
 # CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#
+# 
 # END_ICS_COPYRIGHT8   ****************************************
 
 # [ICS VERSION STRING: @(#) ./bin/opahfirev 0mwhe.20151019 [10/19/15 15:19]
@@ -70,7 +70,7 @@ fi
 
 BASEDIR=/sys/bus/pci/devices
 
-hfis=`/sbin/lspci -Dd '8086:*' | egrep -e "24f[01]|Omni-Path" | grep -vi bridge | cut -d\  -f1`
+hfis=`/sbin/lspci -nn -D -d '8086:*' | egrep -e "24f[01]|Omni-Path" | grep -vi bridge | cut -d\  -f1`
 
 if [ -z "$hfis" ]
 then 
@@ -132,7 +132,7 @@ else
 			fi
 		fi
 
-		pci_id=`lspci -n -d 0x8086:* | egrep -o -m1 24f[01]`
+		pci_id=`lspci -n -D -d 0x8086:* | grep ${hfi} | egrep -o 24f[01]`
 		if [ -z "${pci_id}" ]
 		then
 			echo "Error identifying HFI's on the PCI bus">&2

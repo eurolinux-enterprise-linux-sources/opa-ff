@@ -1,7 +1,7 @@
 #!/bin/bash
 # BEGIN_ICS_COPYRIGHT8 ****************************************
 # 
-# Copyright (c) 2015, Intel Corporation
+# Copyright (c) 2015-2017, Intel Corporation
 # 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -159,7 +159,7 @@ job_cleanup()
 		echo "Killing hostverify and xhpl on hosts..."
 		# we use patterns so the pkill doesn't kill this script or opacmdall itself
 		# use an echo at end so exit status is good
-		opacmdall -p -T 60 "pkill -9 -f 'host[v]erify.sh'; pkill -9 '[x]hpl'; echo -n"
+		opacmdall -p -T 60 "pkill -9 -f -x 'host[v]erify.*.sh'; pkill -9 '[x]hpl'; echo -n"
 	fi
 }
 

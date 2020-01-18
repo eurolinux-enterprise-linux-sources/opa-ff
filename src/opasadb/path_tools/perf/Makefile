@@ -1,6 +1,6 @@
 # BEGIN_ICS_COPYRIGHT8 ****************************************
 # 
-# Copyright (c) 2015, Intel Corporation
+# Copyright (c) 2015-2017, Intel Corporation
 # 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -104,7 +104,7 @@ INCLUDE_SUBDIR		=
 #DEPENDLOCAL	= user defined makedepend flags [Empty]
 #LINTLOCAL	= User defined lint flags [Empty]
 # User include directories to search for C/C++ headers
-LOCAL_INCLUDE_DIRS	= ..
+LOCAL_INCLUDE_DIRS	= 
 #LDLOCAL	= User defined C flags for linking [Empty]
 #IMPLIBLOCAL	= User flags for Object Lirary Manager [Empty]
 #MIDLLOCAL	= User flags for IDL compiler [Empty]

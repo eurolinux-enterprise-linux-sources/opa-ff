@@ -1,24 +1,41 @@
-From 816804bc2313ae593dfa76bd7356abed04e78047 Mon Sep 17 00:00:00 2001
+From 9af7f4f3214d9448fbbbc253dda11000732b3aed Mon Sep 17 00:00:00 2001
 From: Honggang Li <honli@redhat.com>
-Date: Fri, 20 Oct 2017 09:50:48 +0800
+Date: Thu, 19 Apr 2018 11:43:34 +0800
 Subject: [PATCH] update ff-install script
 
 Signed-off-by: Honggang Li <honli@redhat.com>
 ---
- OpenIb_Host/ff_filegroups.sh | 15 ---------------
+ OpenIb_Host/ff_filegroups.sh | 20 ++------------------
  OpenIb_Host/ff_install.sh    | 11 -----------
- 2 files changed, 26 deletions(-)
+ 2 files changed, 2 insertions(+), 29 deletions(-)
 
 diff --git a/OpenIb_Host/ff_filegroups.sh b/OpenIb_Host/ff_filegroups.sh
-index 85ae4b8..3de17b8 100644
+index 225a63cbea0c..aa5d6280749b 100644
 --- a/OpenIb_Host/ff_filegroups.sh
 +++ b/OpenIb_Host/ff_filegroups.sh
-@@ -90,18 +90,3 @@ opamgt_iba_headers="ib_avtracker.h ib_cm.h ib_debug_osd.h ib_generalServices.h i
+@@ -1,5 +1,5 @@
+ basic_tools_sbin="opacapture opafabricinfo opagetvf opagetvf_env opahfirev
+-	opapacketcapture opaportinfo oparesolvehfiport opasaquery opasmaquery
++	opaportinfo oparesolvehfiport opasaquery opasmaquery
+ 	opainfo"
+ 
+ basic_tools_sbin_sym="opapmaquery opaportconfig"
+@@ -9,7 +9,7 @@ basic_tools_opt="setup_self_ssh usemem opaipcalc"
+ basic_lib_opa_opt=".comp_fastfabric.pl .comp_oftools.pl"
+ 
+ basic_mans="opacapture.1 opaconfig.1 opafabricinfo.1 opagetvf.1
+-	opagetvf_env.1 opahfirev.1 opainfo.1 opapacketcapture.1 opapmaquery.1
++	opagetvf_env.1 opahfirev.1 opainfo.1 opapmaquery.1
+ 	opaportconfig.1 opaportinfo.1 oparesolvehfiport.1 opasaquery.1
+ 	opasmaquery.1"
+ 
+@@ -92,19 +92,3 @@ opamgt_iba_headers="ib_mad.h ib_sa_records.h ib_sd.h ib_sm_types.h
  opamgt_iba_public_headers="datatypes.h datatypes_osd.h ibyteswap.h ibyteswap_osd.h
  	ilist.h imath.h imemory.h imemory_osd.h ipackoff.h ipackon.h ispinlock.h
- 	ispinlock_osd.h statustext.h"
+ 	ispinlock_osd.h statustext.h iethernet.h"
 -
--opamgt_examples="paquery.c saquery.c simple_sa_query.c simple_pa_query.c Makefile README"
+-opamgt_examples="paquery.c saquery.c simple_sa_query.c simple_sa_notice.c simple_pa_query.c
+-	job_schedule.c show_switch_cost_matrix.c Makefile README"
 -
 -mpi_apps_files="Makefile mpi_hosts.sample README prepare_run select_mpi run_bw
 -	get_selected_mpi.sh get_mpi_cc.sh *.params gen_group_hosts gen_mpi_hosts
@@ -31,12 +48,12 @@ index 85ae4b8..3de17b8 100644
 -
 -shmem_apps_files="Makefile mpi_hosts.sample prepare_run README select_mpi run_barrier
 -	run_get_bibw run_get_bw run_get_latency run_put_bibw run_put_bw run_put_latency
--	run_reduce run_hello run_alltoall run_rand shmem-hello.c"
+-	run_reduce run_hello run_alltoall shmem-hello.c"
 diff --git a/OpenIb_Host/ff_install.sh b/OpenIb_Host/ff_install.sh
-index 6cac01c..8a85a13 100755
+index ae86a899ad27..412be5812108 100755
 --- a/OpenIb_Host/ff_install.sh
 +++ b/OpenIb_Host/ff_install.sh
-@@ -23,10 +23,8 @@ mkdir -p ${DESTDIR}/etc/rdma
+@@ -28,10 +28,8 @@ mkdir -p ${DESTDIR}/etc/rdma
  mkdir -p ${DESTDIR}/etc/opa
  mkdir -p ${DESTDIR}/usr/include/infiniband
  mkdir -p ${DESTDIR}/usr/include/opamgt/iba/public
@@ -47,15 +64,15 @@ index 6cac01c..8a85a13 100755
  
  # Copy the comp.pl file before changing directories
  cp -t ${DESTDIR}/usr/lib/opa OpenIb_Host/.comp_fastfabric.pl
-@@ -50,7 +48,6 @@ cd ../opamgt
+@@ -55,7 +53,6 @@ cd ../opamgt
  cp -t ${DESTDIR}/usr/include/opamgt $opamgt_headers
  cp -t ${DESTDIR}/usr/include/opamgt/iba $opamgt_iba_headers
  cp -t ${DESTDIR}/usr/include/opamgt/iba/public $opamgt_iba_public_headers
 -cp -t ${DESTDIR}/usr/src/opamgt $opamgt_examples
  
- cd ../bin
- cp -t ${DESTDIR}/usr/lib/opa/tools/ $ff_tools_opt
-@@ -83,14 +80,6 @@ cd ../man8
+ OPAMGT_VERNO_MAJOR=$(cat version | cut -d . -f 1)
+ 
+@@ -91,14 +88,6 @@ cd ../man8
  cp -t ${DESTDIR}/usr/share/man/man8 $ff_mans
  cd ..
  
@@ -71,5 +88,5 @@ index 6cac01c..8a85a13 100755
  cd ../config
  cp -t ${DESTDIR}/etc/rdma dsap.conf
 -- 
-2.14.0
+2.15.0-rc1
 

@@ -1,12 +1,12 @@
 .\" .\" *********************************************************************
 .\" .\" *                                                                   *
-.\" .\" *             Copyright 2015-2017, Intel Corporation                *
+.\" .\" *             Copyright 2015-2018, Intel Corporation                *
 .\" .\" *                                                                   *
 .\" .\" *                       All Rights Reserved.                        *
 .\" .\" *                                                                   *
 .\" .\" *********************************************************************
 
-.TH opaverifyhosts 8 "Intel Corporation" "Copyright(C) 2015\-2017" "Master map: IFSFFCLIRG (Man Page)" 
+.TH opaverifyhosts 8 "Intel Corporation" "Copyright(C) 2015\-2018" "Master map: IFSFFCLIRG (Man Page)" 
 .SH NAME
 opaverifyhosts
 
@@ -80,7 +80,7 @@ Specifies the time limit in seconds for host to complete tests. Default is 300 s
 Specifies the filename of hostverify script to use. Default is /root/hostverify.sh.
 
 .TP 10
- \fItest\fR 
+\fItest\fR 
 .NL
 Specifies one or more specific tests to run. See
 .br

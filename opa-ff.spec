@@ -1,15 +1,15 @@
 Name:    opa-ff
 Epoch: 1
-Version: 10.5.0.0.140
-Release: 2%{?dist}
+Version: 10.7.0.0.133
+Release: 1%{?dist}
 Summary: Intel Omni-Path basic tools and libraries for fabric management
-License: BSD
+License: BSD or GPLv2
 Url: https://github.com/01org/opa-ff
 # tarball created by:
 # git clone https://github.com/01org/opa-ff.git
 # cd opa-ff
 # git archive --format=tar --prefix=opa-ff-%{version}/ \
-# 206c362b545ab1acd42b36822e5083fb74d26e63 | xz > opa-ff-%{version}.tar.xz
+# c6b993a4c724f7f3dd3f62a8a5371b0d170b7334 | xz > opa-ff-%{version}.tar.xz
 Source: %{name}-%{version}.tar.xz
 
 Patch0005: 0001-Add-literal-format-strings-into-snprintf-function.patch
@@ -18,7 +18,7 @@ Patch0007: update-ff-install-script.patch
 
 BuildRequires: gcc-c++
 BuildRequires: openssl-devel, tcl-devel, ncurses-devel
-BuildRequires: libibumad-devel, libibverbs-devel, libibmad-devel, ibacm-devel, expat-devel
+BuildRequires: libibumad-devel, rdma-core-devel, libibmad-devel, ibacm-devel, expat-devel
 BuildRequires: perl
 
 ExclusiveArch: x86_64
@@ -87,11 +87,11 @@ export release_COPT_Flags='%{optflags}'
 export release_CCOPT_Flags='%{optflags}'
 
 cd OpenIb_Host
-./ff_build.sh %{_builddir} $FF_BUILD_ARGS
+./ff_build.sh %{_builddir} $BUILD_ARGS
 
 
 %install
-BUILDDIR=%{_builddir} DESTDIR=%{buildroot} LIBDIR=%{_libdir} ./OpenIb_Host/ff_install.sh
+BUILDDIR=%{_builddir} DESTDIR=%{buildroot} LIBDIR=%{_libdir} DSAP_LIBDIR=%{_libdir} ./OpenIb_Host/ff_install.sh
 
 %post -n opa-address-resolution -p /sbin/ldconfig
 %postun -n opa-address-resolution -p /sbin/ldconfig
@@ -106,13 +106,11 @@ BUILDDIR=%{_builddir} DESTDIR=%{buildroot} LIBDIR=%{_libdir} ./OpenIb_Host/ff_in
 %{_sbindir}/opagetvf
 %{_sbindir}/opagetvf_env
 %{_sbindir}/opahfirev
-%{_sbindir}/opapacketcapture
 %{_sbindir}/opaportinfo
 %{_sbindir}/oparesolvehfiport
 %{_sbindir}/opasaquery
 %{_sbindir}/opasmaquery
 %{_sbindir}/opainfo
-%{_sbindir}/opatmmtool
 %{_sbindir}/opapmaquery
 %{_sbindir}/opaportconfig
 %{_prefix}/lib/opa/tools/setup_self_ssh
@@ -127,14 +125,14 @@ BUILDDIR=%{_builddir} DESTDIR=%{buildroot} LIBDIR=%{_libdir} ./OpenIb_Host/ff_in
 %{_mandir}/man1/opagetvf_env.1.gz
 %{_mandir}/man1/opahfirev.1.gz
 %{_mandir}/man1/opainfo.1.gz
-%{_mandir}/man1/opapacketcapture.1.gz
 %{_mandir}/man1/opapmaquery.1.gz
 %{_mandir}/man1/opaportconfig.1.gz
 %{_mandir}/man1/opaportinfo.1.gz
 %{_mandir}/man1/oparesolvehfiport.1.gz
 %{_mandir}/man1/opasaquery.1.gz
 %{_mandir}/man1/opasmaquery.1.gz
-%{_mandir}/man1/opatmmtool.1.gz
+%{_prefix}/share/opa/samples/opamgt_tls.xml-sample
+%config(noreplace) %{_sysconfdir}/opa/opamgt_tls.xml
 
 %files -n opa-fastfabric
 %license LICENSE
@@ -156,7 +154,6 @@ BUILDDIR=%{_builddir} DESTDIR=%{buildroot} LIBDIR=%{_libdir} ./OpenIb_Host/ff_in
 %{_sbindir}/opasorthosts
 %{_sbindir}/opatop
 %{_sbindir}/opaxlattopology
-%{_sbindir}/opaxlattopology_cust
 %{_sbindir}/opaxmlextract
 %{_sbindir}/opaxmlfilter
 %{_sbindir}/opaxmlgenerate
@@ -192,7 +189,6 @@ BUILDDIR=%{_builddir} DESTDIR=%{buildroot} LIBDIR=%{_libdir} ./OpenIb_Host/ff_in
 %{_sbindir}/opauploadall
 %{_sbindir}/opapaquery
 %{_sbindir}/opashowmc
-%{_sbindir}/opafequery
 %{_sbindir}/opa2rm
 %{_sbindir}/opafmconfigcheck
 %{_sbindir}/opafmconfigdiff
@@ -283,14 +279,13 @@ BUILDDIR=%{_builddir} DESTDIR=%{buildroot} LIBDIR=%{_libdir} ./OpenIb_Host/ff_in
 %{_prefix}/share/opa/samples/linksum_swd24.csv
 %{_prefix}/share/opa/samples/README.topology
 %{_prefix}/share/opa/samples/README.xlat_topology
-%{_prefix}/share/opa/samples/topology_cust.xlsx
-%{_prefix}/share/opa/samples/topology.xlsx
+%{_prefix}/share/opa/samples/minimal_topology.xlsx
+%{_prefix}/share/opa/samples/detailed_topology.xlsx
 %{_prefix}/share/opa/samples/allhosts-sample
 %{_prefix}/share/opa/samples/chassis-sample
 %{_prefix}/share/opa/samples/hosts-sample
 %{_prefix}/share/opa/samples/switches-sample
 %{_prefix}/share/opa/samples/ports-sample
-%{_prefix}/share/opa/samples/opaff.xml-sample
 %{_prefix}/share/opa/samples/mac_to_dhcp
 %{_prefix}/share/opa/samples/filterFile.txt
 %{_prefix}/share/opa/samples/triggerFile.txt
@@ -325,7 +320,6 @@ BUILDDIR=%{_builddir} DESTDIR=%{buildroot} LIBDIR=%{_libdir} ./OpenIb_Host/ff_in
 %{_mandir}/man8/opaextractstat2.8.gz
 %{_mandir}/man8/opafabricanalysis.8.gz
 %{_mandir}/man8/opafastfabric.8.gz
-%{_mandir}/man8/opafequery.8.gz
 %{_mandir}/man8/opafindgood.8.gz
 %{_mandir}/man8/opafmconfigcheck.8.gz
 %{_mandir}/man8/opafmconfigdiff.8.gz
@@ -349,7 +343,6 @@ BUILDDIR=%{_builddir} DESTDIR=%{buildroot} LIBDIR=%{_libdir} ./OpenIb_Host/ff_in
 %{_mandir}/man8/opauploadall.8.gz
 %{_mandir}/man8/opaverifyhosts.8.gz
 %{_mandir}/man8/opaxlattopology.8.gz
-%{_mandir}/man8/opaxlattopology_cust.8.gz
 %{_mandir}/man8/opashowmc.8.gz
 %{_mandir}/man8/opaxmlextract.8.gz
 %{_mandir}/man8/opaxmlfilter.8.gz
@@ -370,7 +363,6 @@ BUILDDIR=%{_builddir} DESTDIR=%{buildroot} LIBDIR=%{_libdir} ./OpenIb_Host/ff_in
 %config(noreplace) %{_sysconfdir}/opa/hosts
 %config(noreplace) %{_sysconfdir}/opa/ports
 %config(noreplace) %{_sysconfdir}/opa/switches
-%config(noreplace) %{_sysconfdir}/opa/opaff.xml
 %config(noreplace) %{_prefix}/lib/opa/tools/osid_wrapper
 
 
@@ -380,8 +372,8 @@ BUILDDIR=%{_builddir} DESTDIR=%{buildroot} LIBDIR=%{_libdir} ./OpenIb_Host/ff_in
 %{_bindir}/opa_osd_exercise
 %{_bindir}/opa_osd_perf
 %{_bindir}/opa_osd_query
-%{_prefix}/lib/ibacm
-%{_prefix}/lib/libopasadb.so.*
+%{_libdir}/ibacm
+%{_libdir}/libopasadb.so.*
 %{_includedir}/infiniband
 %{_mandir}/man1/opa_osd_dump.1*
 %{_mandir}/man1/opa_osd_exercise.1*
@@ -392,11 +384,17 @@ BUILDDIR=%{_builddir} DESTDIR=%{buildroot} LIBDIR=%{_libdir} ./OpenIb_Host/ff_in
 %files -n opa-libopamgt
 %{_prefix}/lib/libopamgt.*
 
+
 %files -n opa-libopamgt-devel
 %{_includedir}/opamgt
 
 
 %changelog
+* Thu Apr 19 2018 Honggang Li <honli@redhat.com> - 10.7.0.0.133-1
+- Rebase to upstream release v10.7.0.0.133
+- Delete opapacketcapture
+- Resolves: bz1483552, bz1457762
+
 * Thu Dec 28 2017 Honggang Li <honli@redhat.com> - 10.5.0.0.140-2
 - Don't require a specific build version of opa-basic-tools.
 - Resolves: bz1528687

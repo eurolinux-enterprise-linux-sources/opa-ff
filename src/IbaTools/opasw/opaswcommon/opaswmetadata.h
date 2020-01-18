@@ -1,6 +1,6 @@
 /* BEGIN_ICS_COPYRIGHT3 ****************************************
 
-Copyright (c) 2015, Intel Corporation
+Copyright (c) 2015-2017, Intel Corporation
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -9,7 +9,7 @@ modification, are permitted provided that the following conditions are met:
       this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
-     documentation and/or other materials provided with the distribution.
+      documentation and/or other materials provided with the distribution.
     * Neither the name of Intel Corporation nor the names of its contributors
       may be used to endorse or promote products derived from this software
       without specific prior written permission.
@@ -213,6 +213,7 @@ FSTATUS parseDataTable(table_meta_data_t *metaData, uint8 *dataBuffer, uint16 ta
 uint32 getModuleType(struct omgt_port *port, IB_PATH_RECORD *path, uint16 sessionID);
 uint32 getNumPorts(struct omgt_port *port, IB_PATH_RECORD *path, uint16 sessionID);
 FSTATUS getNodeDescription(struct omgt_port *port, IB_PATH_RECORD *path, uint16 sessionID, uint8 *nodeDesc);
+FSTATUS getFmPushButtonState(struct omgt_port *port, IB_PATH_RECORD *path, uint16 sessionID, uint32 *state);
 FSTATUS getGuid(struct omgt_port *port, IB_PATH_RECORD *path, uint16 sessionID, EUI64 *guid, int which);
 
 #endif /* _XEDGE_METADATA_H_ */

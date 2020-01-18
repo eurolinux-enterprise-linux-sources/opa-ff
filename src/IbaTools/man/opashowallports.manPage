@@ -1,12 +1,12 @@
 .\" .\" *********************************************************************
 .\" .\" *                                                                   *
-.\" .\" *             Copyright 2015-2017, Intel Corporation                *
+.\" .\" *             Copyright 2015-2018, Intel Corporation                *
 .\" .\" *                                                                   *
 .\" .\" *                       All Rights Reserved.                        *
 .\" .\" *                                                                   *
 .\" .\" *********************************************************************
 
-.TH opashowallports 8 "Intel Corporation" "Copyright(C) 2015\-2017" "Master map: IFSFFCLIRG (Man Page)" 
+.TH opashowallports 8 "Intel Corporation" "Copyright(C) 2015\-2018" "Master map: IFSFFCLIRG (Man Page)" 
 .SH NAME
 opashowallports
 
@@ -105,7 +105,7 @@ opashowallports -C
 .br
 opashowallports -H \[aq]chassis1 chassis2\[aq]
 .br
-CHASSIS=\[aq]chassis1 chasssi2\[aq] opashowallports
+CHASSIS=\[aq]chassis1 chassis2\[aq] opashowallports -C
 .SH Notes
 .NL
 

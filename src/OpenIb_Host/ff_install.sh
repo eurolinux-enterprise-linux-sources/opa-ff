@@ -4,6 +4,11 @@ set -x
 [ -z "${BUILDDIR}" ] && BUILDDIR="."
 [ -z "${DESTDIR}" ] && DESTDIR="/"
 [ -z "${LIBDIR}" ] && LIBDIR=/usr/lib
+[ -z "${DSAP_LIBDIR}" ] && DSAP_LIBDIR="$DSAP_LIBDIR"
+
+if [ -n ${DSAP_LIBDIR}]; then
+	DSAP_LIBDIR="/usr/lib"
+fi
 
 if [ ! -f "${BUILDDIR}/RELEASE_PATH" ]; then
     echo "Wrong BUILDDIR? No such file ${BUILDDIR}/RELEASE_PATH"
@@ -18,7 +23,7 @@ mkdir -p ${DESTDIR}/usr/bin
 mkdir -p ${DESTDIR}/usr/sbin
 mkdir -p ${DESTDIR}/usr/lib/opa/{tools,fm_tools}
 mkdir -p ${DESTDIR}/usr/share/opa/{samples,help}
-mkdir -p ${DESTDIR}/usr/lib/ibacm
+mkdir -p ${DESTDIR}/${DSAP_LIBDIR}/ibacm
 mkdir -p ${DESTDIR}/etc/rdma
 mkdir -p ${DESTDIR}/etc/opa
 mkdir -p ${DESTDIR}/usr/include/infiniband
@@ -52,6 +57,8 @@ cp -t ${DESTDIR}/usr/include/opamgt/iba $opamgt_iba_headers
 cp -t ${DESTDIR}/usr/include/opamgt/iba/public $opamgt_iba_public_headers
 cp -t ${DESTDIR}/usr/src/opamgt $opamgt_examples
 
+OPAMGT_VERNO_MAJOR=$(cat version | cut -d . -f 1)
+
 cd ../bin
 cp -t ${DESTDIR}/usr/lib/opa/tools/ $ff_tools_opt
 
@@ -59,6 +66,7 @@ cd ../fastfabric
 cp -t ${DESTDIR}/usr/sbin $ff_tools_sbin
 cp -t ${DESTDIR}/usr/lib/opa/tools/ $ff_tools_misc
 cp -t ${DESTDIR}/usr/share/opa/help $help_doc
+cp -t ${DESTDIR}/etc/opa $basic_configs
 
 cd ../etc
 cp -t ${DESTDIR}/usr/lib/opa/fm_tools/ $ff_tools_fm
@@ -66,14 +74,14 @@ ln -s /usr/lib/opa/fm_tools/config_check ${DESTDIR}/usr/sbin/opafmconfigcheck
 ln -s /usr/lib/opa/fm_tools/config_diff ${DESTDIR}/usr/sbin/opafmconfigdiff
 
 cd ../fastfabric/samples
-cp -t ${DESTDIR}/usr/share/opa/samples $ff_iba_samples
+cp -t ${DESTDIR}/usr/share/opa/samples $ff_iba_samples $basic_samples
 cd ..
 
 cd ../fastfabric/tools
 cp -t ${DESTDIR}/usr/lib/opa/tools/ $ff_tools_exp
 cp -t ${DESTDIR}/usr/lib/opa/tools/ $ff_libs_misc
 cp -t ${DESTDIR}/usr/lib/opa/tools/ osid_wrapper
-cp -t ${DESTDIR}/etc/opa allhosts chassis esm_chassis hosts ports switches opaff.xml
+cp -t ${DESTDIR}/etc/opa allhosts chassis esm_chassis hosts ports switches
 cd ..
 
 cd ../man/man1
@@ -99,11 +107,10 @@ cp -t ${DESTDIR}/etc/opa opamon.conf opamon.si.conf
 #Libraries installing
 #cd ../builtlibs.OPENIB_FF.release
 cd $(cat $BUILDDIR/LIB_PATH)
-cp -t ${DESTDIR}/usr/lib libopasadb.so.*
-cp -t ${DESTDIR}/usr/lib/ibacm libdsap.so.*
+cp -t ${DESTDIR}/${DSAP_LIBDIR} libopasadb.so.*
+cp -t ${DESTDIR}/${DSAP_LIBDIR}/ibacm libdsap.so.*
 cp -t ${DESTDIR}/usr/lib libopamgt.so.*
-ln -s libopamgt.so.* ${DESTDIR}/usr/lib/libopamgt.so.0
-ln -s libopamgt.so.0 ${DESTDIR}/usr/lib/libopamgt.so
+ln -s libopamgt.so.${OPAMGT_VERNO_MAJOR} ${DESTDIR}/usr/lib/libopamgt.so
 
 
 # Now that we've put everything in the buildroot, copy any default config files to their expected location for user
