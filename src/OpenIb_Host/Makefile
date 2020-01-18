@@ -52,36 +52,30 @@ EXECUTABLE		= # OPENIB_FF$(EXE_SUFFIX)
 
 DIRS			= \
 	$(TL_DIR)/Makerules \
-	$(shell $(OPTIONALDIR) $(TL_DIR)/IbAccess) \
-	$(shell $(OPTIONALDIR) $(TL_DIR)/oib_utils) \
-	$(shell $(OPTIONALDIR) $(TL_DIR)/opa_fe_utils) \
-	$(shell $(OPTIONALDIR) $(TL_DIR)/Xml) \
-	$(shell $(OPTIONALDIR) $(TL_DIR)/IbaTools) \
-	$(shell $(OPTIONALDIR) $(TL_DIR)/MpiApps) \
-	$(shell $(OPTIONALDIR) $(TL_DIR)/ShmemApps) \
-	$(shell $(OPTIONALDIR) $(TL_DIR)/Iih) \
-	$(shell $(OPTIONALDIR) $(TL_DIR)/zlib) \
-	$(shell $(OPTIONALDIR) $(TL_DIR)/TestTools) \
-	$(shell $(OPTIONALDIR) $(TL_DIR)/SrpTools) \
-	$(shell $(OPTIONALDIR) $(TL_DIR)/InicTools) \
-	$(shell $(OPTIONALDIR) $(TL_DIR)/Tests) \
-	$(shell $(OPTIONALDIR) $(TL_DIR)/IbaTests) \
-	$(shell $(OPTIONALDIR) $(TL_DIR)/IbPrint) \
-	$(shell $(OPTIONALDIR) $(TL_DIR)/Topology) \
-	$(shell $(OPTIONALDIR) $(TL_DIR)/opasadb) \
-	$(shell $(OPTIONALDIR) $(TL_DIR)/Md5) \
-	$(shell $(OPTIONALDIR) $(TL_DIR)/Lsf) \
-	$(shell $(OPTIONALDIR) $(TL_DIR)/Moab) \
-	$(shell $(OPTIONALDIR) $(TL_DIR)/Dsap) \
-	$(shell $(OPTIONALDIR) $(TL_DIR)/Esm/ib/src/linux/log/usr) \
-	$(shell $(OPTIONALDIR) $(TL_DIR)/Esm/ib/src/ibaccess) \
-	$(shell $(OPTIONALDIR) $(TL_DIR)/Esm/ib/src/cs) \
-	$(shell $(OPTIONALDIR) $(TL_DIR)/Esm/ib/src/config) \
-	$(shell $(OPTIONALDIR) $(TL_DIR)/Esm/ib/src/linux/startup/fm_config) \
+	$(TL_DIR)/IbAccess \
+	$(TL_DIR)/opamgt \
+	$(TL_DIR)/Xml \
+	$(TL_DIR)/IbaTools \
+	$(TL_DIR)/MpiApps \
+	$(TL_DIR)/ShmemApps \
+	$(TL_DIR)/Iih \
+	$(TL_DIR)/TestTools \
+	$(TL_DIR)/IbPrint \
+	$(TL_DIR)/Topology \
+	$(TL_DIR)/opasadb \
+	$(TL_DIR)/Md5 \
+	$(TL_DIR)/Lsf \
+	$(TL_DIR)/Moab \
+	$(TL_DIR)/Dsap \
+	$(TL_DIR)/Esm/ib/src/linux/log/usr \
+	$(TL_DIR)/Esm/ib/src/ibaccess \
+	$(TL_DIR)/Esm/ib/src/cs \
+	$(TL_DIR)/Esm/ib/src/config \
+	$(TL_DIR)/Esm/ib/src/linux/startup/fm_config \
 	$(BUILD_TARGET_OS)
 
 				# DISABLED - MWHEINZ
-				#$(shell $(OPTIONALDIR) $(TL_DIR)/L8sim)
+				#$(TL_DIR)/L8sim
 
 
 # C files (.c)
@@ -209,58 +203,15 @@ endif
 
 # OS specific packaging step
 # package builds standard package
-# package_full can include extra depricated items
-package package_full:
+package:
 	cd $(BUILD_TARGET_OS) && $(MAKE) $(MFLAGS) $@
-.PHONY:  package package_full
+.PHONY:  package
 
 vars_include: vars_include_global
 
 final_package:
-	if [ -d rpmbuild ]; then \
-		cd rpmbuild; \
-	else \
-		cd ../rpmbuild; \
-	fi; \
-	dir=`grep 'IntelOPA-Tools-FF\.' BUILD/opa-$${MKRPM_VER}/packaged_files |xargs dirname`; \
-	filename=`grep 'IntelOPA-Tools-FF\.' BUILD/opa-$${MKRPM_VER}/packaged_files|xargs basename`; \
-	subdir=$${filename%.tgz}; \
-	srpmdir=$$dir/$$subdir/SRPMS; \
-	basicdir=`grep 'IntelOPA-Tools\.' BUILD/opa-$${MKRPM_VER}/packaged_files |xargs dirname`; \
-	basic=`grep 'IntelOPA-Tools\.' BUILD/opa-$${MKRPM_VER}/packaged_files|xargs basename`; \
-	arch=`echo $(BUILD_TARGET) | tr '[A-Z]' '[a-z]'`; \
-	rpmdir=$$dir/$$subdir/RPMS/$$arch;\
-	basicrpmdir=$$basicdir/$${basic%.tgz}/RPMS/$$arch;\
-	basicsrpmdir=$$basicdir/$${basic%.tgz}/SRPMS;\
-	mkdir -p $$srpmdir; if [ $$? -ne 0 ]; then echo "ERR""OR: mkdir $$srpmdir."; fi; \
-	mkdir -p $$rpmdir; if [ $$? -ne 0 ]; then echo "ERR""OR: mkdir $$rpmdir."; fi; \
-	rm -rf $${basicdir}/$${basic} $${basicdir}/$${basic%.tgz}; \
-	cp -rp $${dir}/$${subdir} $${basicdir}/$${basic%.tgz}; if [ $$? -ne 0 ]; then echo "ERR""OR: cp $${basicdir}/$${basic%.tgz}."; fi; \
-	cp SRPMS/opa-mpi-apps-$${MKRPM_VER}-$${MKRPM_REL}.src.rpm $$srpmdir/ ; if [ $$? -ne 0 ]; then echo "ERR""OR: cp $$srpmdir."; fi; \
-	cp SRPMS/opa-$${MKRPM_VER}-$${MKRPM_REL}.src.rpm $$srpmdir/ ; if [ $$? -ne 0 ]; then echo "ERR""OR: cp $$srpmdir."; fi; \
-	cp SRPMS/opa-$${MKRPM_VER}-$${MKRPM_REL}.src.rpm $$basicsrpmdir/ ; if [ $$? -ne 0 ]; then echo "ERR""OR: cp $$srpmdir."; fi; \
-	cp RPMS/$$arch/opa-basic-tools-$${MKRPM_VER}-$${MKRPM_REL}.$$arch.rpm $$rpmdir/; if [ $$? -ne 0 ]; then echo "ERR""OR: cp $$rpmdir."; fi; \
-	cp RPMS/$$arch/opa-address-resolution-$${MKRPM_VER}-$${MKRPM_REL}.$$arch.rpm $$rpmdir/; if [ $$? -ne 0 ]; then echo "ERR""OR: cp $$rpmdir."; fi; \
-	cp RPMS/$$arch/opa-fastfabric-$${MKRPM_VER}-$${MKRPM_REL}.$$arch.rpm $$rpmdir/; if [ $$? -ne 0 ]; then echo "ERR""OR: cp $$rpmdir."; fi; \
-	cp RPMS/$$arch/opa-basic-tools-$${MKRPM_VER}-$${MKRPM_REL}.$$arch.rpm $$basicrpmdir/; if [ $$? -ne 0 ]; then echo "ERR""OR: cp $$basicrpmdir."; fi; \
-	cp RPMS/$$arch/opa-address-resolution-$${MKRPM_VER}-$${MKRPM_REL}.$$arch.rpm $$basicrpmdir/; if [ $$? -ne 0 ]; then echo "ERR""OR: cp $$basicrpmdir."; fi; \
-	cp RPMS/$$arch/opa-mpi-apps-$${MKRPM_VER}-$${MKRPM_REL}.$$arch.rpm $$rpmdir/; if [ $$? -ne 0 ]; then echo "ERR""OR: cp $$rpmdir."; fi; \
-	if [ "$(BUILD_TARGET_OS_VENDOR)" = "redhat" ]; then \
-		cp RPMS/$$arch/opa-debuginfo-$${MKRPM_VER}-$${MKRPM_REL}.$$arch.rpm $$rpmdir/;  \
-	fi; \
-	if [ "$(BUILD_TARGET_OS_VENDOR)" = "SuSE" ]; then \
-		cp RPMS/$$arch/opa-debugsource-$${MKRPM_VER}-$${MKRPM_REL}.$$arch.rpm $$rpmdir/;  \
-		cp RPMS/$$arch/opa-basic-tools-debuginfo-$${MKRPM_VER}-$${MKRPM_REL}.$$arch.rpm $$rpmdir/;  \
-		cp RPMS/$$arch/opa-basic-tools-debuginfo-$${MKRPM_VER}-$${MKRPM_REL}.$$arch.rpm $$basicrpmdir/;  \
-		cp RPMS/$$arch/opa-address-resolution-debuginfo-$${MKRPM_VER}-$${MKRPM_REL}.$$arch.rpm $$rpmdir/;  \
-		cp RPMS/$$arch/opa-address-resolution-debuginfo-$${MKRPM_VER}-$${MKRPM_REL}.$$arch.rpm $$basicrpmdir/;  \
-		cp RPMS/$$arch/opa-fastfabric-debuginfo-$${MKRPM_VER}-$${MKRPM_REL}.$$arch.rpm $$rpmdir/;  \
-	fi; \
-	cd $$dir; \
-	echo "Packaging $$dir/$$filename ..."; \
-	tar cfz $$filename $$subdir; \
-	echo "Packaging $$basicdir/$$basic ..."; \
-	tar cfz $${basic} --exclude mpi --exclude shmem $${basic%.tgz}; 
+	cd $(BUILD_TARGET_OS) && $(MAKE) $(MFLAGS) $@
+.PHONY:  final_package
 
 # Unit test execution
 #include $(TL_DIR)/Makerules/Maketargets.runtest

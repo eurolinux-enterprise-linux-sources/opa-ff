@@ -30,50 +30,63 @@
 
 #[ICS VERSION STRING: unknown]
 
+# This script gathers up the FF and mpi_apps source code into tarballs
+# and then makes .src and binary rpms from the tarballs and spec files
+
 set -x
 {
 
 export FF_BUILD_ARGS=$*
 
-#Will need updated module version.
-echo "export MODULEVERSION=${MODULEVERSION}" >> build.env
+FILES_TO_TAR=
+# if in-place build left builtbin, builtinclude and builtlibs, pick them up
+# to accelerate incremental builds
+for i in builtbin builtinclude builtlibs builtinplace
+do
+	if [ -e $TL_DIR/$i.$PRODUCT.$BUILD_CONFIG ]
+	then
+		FILES_TO_TAR="$FILES_TO_TAR $i.$PRODUCT.$BUILD_CONFIG"
+	fi
+done
 
-BASE_DIR=`pwd`
-FILES_TO_TAR="-T tar_manifest_secondary"
-
-# TODO can this be removed for cvsgitall1?
-if [ `basename $(pwd)` != "OPENIB_FF" ]
-then
-	BASE_DIR=`readlink -f $(pwd)/..`
-	FILES_TO_TAR="OpenIb_Host"
-fi
-
-FILES_TO_TAR=$FILES_TO_TAR" -T tar_manifest_primary"
+FILES_TO_TAR=$FILES_TO_TAR" -T tar_manifest"
 MPIAPPS_FILES_TO_TAR="-T mpiapps_tar_manifest" 
 
-RPMDIR="$BASE_DIR/rpmbuild"
+RPMDIR="$TL_DIR/rpmbuild"
 #rm -rf $RPMDIR
 mkdir -p $RPMDIR/{BUILD,SPECS,BUILDROOT,SOURCES,RPMS,SRPMS}
 
 cp opa.spec.in opa.spec
 sed -i "s/__RPM_VERSION/$RPM_VER/g" opa.spec
 sed -i "s/__RPM_RELEASE/$RPM_REL%{?dist}/g" opa.spec
+sed -i "s/.\/ff_install/OpenIb_Host\/ff_install/g" opa.spec
 ./update_opa_spec.sh
 
 cp mpi-apps.spec.in mpi-apps.spec
 sed -i "s/__RPM_VERSION/$RPM_VER/g" mpi-apps.spec
 sed -i "s/__RPM_RELEASE/$RPM_REL%{?dist}/g" mpi-apps.spec
+./update_mpi_spec.sh
 
-tar czf $RPMDIR/SOURCES/opa.tgz -C $BASE_DIR $FILES_TO_TAR --exclude-vcs --ignore-case --exclude="./rpmbuild" -X tar_excludes
-tar czf $RPMDIR/SOURCES/opa-mpi-apps.tgz -C $BASE_DIR $MPIAPPS_FILES_TO_TAR --exclude-vcs --ignore-case
+if [[ "${RELEASE_TYPE}" == "EMBARGOED" ]]
+then
+	echo "Building Embargoed Release."
+	export OPA_LICENSE_DIR=${TL_DIR}/CodeTemplates/EmbargoedNotices
+	TMP=$(mktemp -d)
+	cp -rp ${TL_DIR}/* ${TMP}
+	${TL_DIR}/CodeTemplates/update_license.sh -c -q ${TMP}
+	tar cvzf ${RPMDIR}/SOURCES/opa.tgz -C ${TMP} ${FILES_TO_TAR} --exclude-vcs --ignore-case --exclude="./rpmbuild" -X tar_excludes
+	rm -rf ${TMP} 
+else
+	echo "Building Public Release."
+	tar cvzf $RPMDIR/SOURCES/opa.tgz -C $TL_DIR $FILES_TO_TAR --exclude-vcs --ignore-case --exclude="./rpmbuild" -X tar_excludes
+fi
+
+tar cvzf $RPMDIR/SOURCES/opa-mpi-apps.tgz -C $TL_DIR $MPIAPPS_FILES_TO_TAR --exclude-vcs --ignore-case
 
 mv opa.spec $RPMDIR/SPECS/
 mv mpi-apps.spec $RPMDIR/SPECS/
 cd $RPMDIR
 }
-set +x
 	
 rpmbuild -ba --define "_topdir $RPMDIR" SPECS/opa.spec
 rpmbuild -ba --define "_topdir $RPMDIR" SPECS/mpi-apps.spec
-
-

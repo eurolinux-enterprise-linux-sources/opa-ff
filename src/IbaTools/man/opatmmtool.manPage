@@ -1,12 +1,12 @@
 .\" .\" *********************************************************************
 .\" .\" *                                                                   *
-.\" .\" *             Copyright 2015-2016, Intel Corporation                *
+.\" .\" *             Copyright 2015-2017, Intel Corporation                *
 .\" .\" *                                                                   *
 .\" .\" *                       All Rights Reserved.                        *
 .\" .\" *                                                                   *
 .\" .\" *********************************************************************
 
-.TH opatmmtool 1 "Intel Corporation" "Copyright(C) 2015\-2016" "Master map: IFSFFCLIRG (Man Page)" 
+.TH opatmmtool 1 "Intel Corporation" "Copyright(C) 2015\-2017" "Master map: IFSFFCLIRG (Man Page)" 
 .SH NAME
 opatmmtool
 
@@ -52,7 +52,8 @@ Includes one of the following:
 
 .sp
 reboot 
-Reboots the TMM.
+Reboots the TMM.Note: Data traffic is not interrupted during a TMM reboot.
+
 .RE
 
 .RS
@@ -76,7 +77,8 @@ Reports the file version. Requires -f \fIfw\(ulfile\fR option.
 
 .sp
 update 
-Performs a firmware update. Requires -f \fIfw\(ulfile\fR option.
+Performs a firmware update. Requires -f \fIfw\(ulfile\fR option.Note: After updating the firmware, use "opatmmtool reboot" to restart the TMM.
+
 .RE
 
 .RS

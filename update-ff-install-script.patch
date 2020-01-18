@@ -1,57 +1,75 @@
-diff --git a/OpenIb_Host/ff_install.sh b/OpenIb_Host/ff_install.sh
-index 0eb0c70..334ba07 100755
---- a/OpenIb_Host/ff_install.sh
-+++ b/OpenIb_Host/ff_install.sh
-@@ -102,28 +102,12 @@ opasadb_header="opasadb_path.h opasadb_route.h opasadb_route2.h"
- 
- opasadb_mans="opa_osd_dump.1 opa_osd_exercise.1 opa_osd_perf.1 opa_osd_query.1"
- 
--mpi_apps_files="Makefile mpi_hosts.sample README prepare_run
--	select_mpi run_bw get_selected_mpi.sh get_mpi_cc.sh
--	*.params gen_group_hosts gen_mpi_hosts mpi_cleanup
--	stop_daemons hpl_dat_gen config_hpl2 run_hpl2 run_lat run_pmb run_imb
--	run_lat2 run_bw2 run_bibw2 run_bcast2 run_app runmyapp mpicheck
--	run_mpicheck run_deviation run_multibw run_mpi_stress run_osu
--	run_cabletest run_allhfilatency run_nxnlatbw run_alltoall3 run_bcast3
--	run_bibw3 run_bw3 run_lat3 run_mbw_mr3 run_multi_lat3 run_batch_script
--	run_batch_cabletest hpl-count.diff groupstress deviation
+From 816804bc2313ae593dfa76bd7356abed04e78047 Mon Sep 17 00:00:00 2001
+From: Honggang Li <honli@redhat.com>
+Date: Fri, 20 Oct 2017 09:50:48 +0800
+Subject: [PATCH] update ff-install script
+
+Signed-off-by: Honggang Li <honli@redhat.com>
+---
+ OpenIb_Host/ff_filegroups.sh | 15 ---------------
+ OpenIb_Host/ff_install.sh    | 11 -----------
+ 2 files changed, 26 deletions(-)
+
+diff --git a/OpenIb_Host/ff_filegroups.sh b/OpenIb_Host/ff_filegroups.sh
+index 85ae4b8..3de17b8 100644
+--- a/OpenIb_Host/ff_filegroups.sh
++++ b/OpenIb_Host/ff_filegroups.sh
+@@ -90,18 +90,3 @@ opamgt_iba_headers="ib_avtracker.h ib_cm.h ib_debug_osd.h ib_generalServices.h i
+ opamgt_iba_public_headers="datatypes.h datatypes_osd.h ibyteswap.h ibyteswap_osd.h
+ 	ilist.h imath.h imemory.h imemory_osd.h ipackoff.h ipackon.h ispinlock.h
+ 	ispinlock_osd.h statustext.h"
+-
+-opamgt_examples="paquery.c saquery.c simple_sa_query.c simple_pa_query.c Makefile README"
+-
+-mpi_apps_files="Makefile mpi_hosts.sample README prepare_run select_mpi run_bw
+-	get_selected_mpi.sh get_mpi_cc.sh *.params gen_group_hosts gen_mpi_hosts
+-	mpi_cleanup stop_daemons hpl_dat_gen config_hpl2 run_hpl2 run_lat run_pmb run_imb run_lat2
+-	run_bw2 run_bibw2 run_bcast2 run_app runmyapp mpicheck run_mpicheck run_deviation
+-	run_multibw run_mpi_stress run_osu run_cabletest run_allhfilatency run_nxnlatbw
+-	run_alltoall3 run_bcast3 run_bibw3 run_bw3 run_lat3 run_mbw_mr3 run_multi_lat3
+-	run_batch_script run_batch_cabletest hpl-count.diff groupstress deviation
 -	hpl-config/HPL.dat-* hpl-config/README"
 -
--shmem_apps_files="Makefile mpi_hosts.sample prepare_run README select_mpi
--	run_barrier run_get_bibw run_get_bw run_get_latency run_put_bibw
--	run_put_bw run_put_latency run_reduce run_hello run_alltoall
--	run_rand shmem-hello.c"
--
- release_string="IntelOPA-Tools-FF.$BUILD_TARGET_OS_ID.$MODULEVERSION"
- 
- #rm -rf $RPM_BUILD_ROOT
- mkdir -p ${DESTDIR}/usr/bin
- mkdir -p ${DESTDIR}/usr/sbin
--mkdir -p ${DESTDIR}/usr/lib/opa/{tools,fm_tools,help,samples,src/mpi_apps,src/shmem_apps}
-+mkdir -p ${DESTDIR}/usr/lib/opa/{tools,fm_tools,help,samples}
- mkdir -p ${DESTDIR}$LIBDIR/ibacm
- mkdir -p ${DESTDIR}/etc/rdma
+-shmem_apps_files="Makefile mpi_hosts.sample prepare_run README select_mpi run_barrier
+-	run_get_bibw run_get_bw run_get_latency run_put_bibw run_put_bw run_put_latency
+-	run_reduce run_hello run_alltoall run_rand shmem-hello.c"
+diff --git a/OpenIb_Host/ff_install.sh b/OpenIb_Host/ff_install.sh
+index 6cac01c..8a85a13 100755
+--- a/OpenIb_Host/ff_install.sh
++++ b/OpenIb_Host/ff_install.sh
+@@ -23,10 +23,8 @@ mkdir -p ${DESTDIR}/etc/rdma
  mkdir -p ${DESTDIR}/etc/opa
-@@ -227,22 +211,6 @@ do
- done
+ mkdir -p ${DESTDIR}/usr/include/infiniband
+ mkdir -p ${DESTDIR}/usr/include/opamgt/iba/public
+-mkdir -p ${DESTDIR}/usr/src/opamgt
+ mkdir -p ${DESTDIR}/usr/share/man/man1
+ mkdir -p ${DESTDIR}/usr/share/man/man8
+-mkdir -p ${DESTDIR}/usr/src/opa/{mpi_apps,shmem_apps}
+ 
+ # Copy the comp.pl file before changing directories
+ cp -t ${DESTDIR}/usr/lib/opa OpenIb_Host/.comp_fastfabric.pl
+@@ -50,7 +48,6 @@ cd ../opamgt
+ cp -t ${DESTDIR}/usr/include/opamgt $opamgt_headers
+ cp -t ${DESTDIR}/usr/include/opamgt/iba $opamgt_iba_headers
+ cp -t ${DESTDIR}/usr/include/opamgt/iba/public $opamgt_iba_public_headers
+-cp -t ${DESTDIR}/usr/src/opamgt $opamgt_examples
+ 
+ cd ../bin
+ cp -t ${DESTDIR}/usr/lib/opa/tools/ $ff_tools_opt
+@@ -83,14 +80,6 @@ cd ../man8
+ cp -t ${DESTDIR}/usr/share/man/man8 $ff_mans
  cd ..
  
 -cd ../src/mpi/mpi_apps
--tar -xzf mpi_apps.tgz -C ${DESTDIR}/usr/lib/opa/src/mpi_apps/
--for i in $mpi_apps_files
--do
--	echo "/usr/lib/opa/src/mpi_apps/$i" >> ${BUILDDIR}/ff_file.list
--done
+-tar -xzf mpi_apps.tgz -C ${DESTDIR}/usr/src/opa/mpi_apps/
 -cd ../../
 -
 -cd ../src/shmem/shmem_apps
--tar -xzf shmem_apps.tgz -C ${DESTDIR}/usr/lib/opa/src/shmem_apps/
--for i in $shmem_apps_files
--do
--	echo "/usr/lib/opa/src/shmem_apps/$i" >> ${BUILDDIR}/ff_file.list
--done
+-tar -xzf shmem_apps.tgz -C ${DESTDIR}/usr/src/opa/shmem_apps/
 -cd ../../
 -
  #Config files
  cd ../config
  cp -t ${DESTDIR}/etc/rdma dsap.conf
+-- 
+2.14.0
+

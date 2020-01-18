@@ -64,7 +64,7 @@ INCLUDE_TARGETS	= \
 				# Add more h hpp files here
 # Non-compiled files
 MISC_FILES		= opatop_group_bw.hlp opatop_group_config.hlp \
-				opatop_group_err.hlp opatop_group_focus.hlp \
+				opatop_group_ctg.hlp opatop_group_focus.hlp \
 				opatop_group_info_sel.hlp opatop_img_config.hlp \
 				opatop_pm_config.hlp opatop_port_stats.hlp \
 				opatop_summary.hlp opatop_vf_bw.hlp \
@@ -124,7 +124,7 @@ ifeq "$(IB_STACK)" "IBACCESS"
 LOCALDEPLIBS=$(IBACCESS_USER_LIBS) Xml Topology
 LOCAL_LIB_DIRS= $(IBACCESS_USER_LIB_DIRS)
 else
-LOCALDEPLIBS=$(IBACCESS_USER_LIBS) Xml Topology oib_utils
+LOCALDEPLIBS=$(IBACCESS_USER_LIBS) Xml Topology opamgt-priv
 LOCALLIBS=$(OPENIB_USER_LIBS)
 LOCAL_LIB_DIRS=$(OPENIB_USER_LIB_DIRS) $(IBACCESS_USER_LIB_DIRS)
 endif

@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "iba/ib_helper.h"
 #include "iba/stl_helper.h"
 #include "iba/stl_types.h"
-#include "oib_utils_sa.h"
+#include "opamgt_sa_priv.h"
 #include <iba/ibt.h>
 #include "opaswcommon.h"
 #include "opaswmetadata.h"
@@ -55,6 +55,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MIN_FT	1
 #define MAX_PS	2
 #define MIN_PS	1
+
+//defining values for fan tray status
+#define FAN_STATUS_0	0X01
+#define FAN_STATUS_1	0X02
+#define FAN_STATUS_2	0X04
+#define FAN_STATUS_3	0X08
+#define FAN_STATUS_4	0X10
+#define FAN_STATUS_5	0X20
+#define FAN_STATUS_TRAY1 (FAN_STATUS_0 | FAN_STATUS_1 | FAN_STATUS_2)
+#define FAN_STATUS_TRAY2 (FAN_STATUS_3 | FAN_STATUS_4 | FAN_STATUS_5)
 
 // globals
 
@@ -158,7 +168,9 @@ int main(int argc, char *argv[])
 	char				portLinkCRCModeValue[35];
 	char				portLinkWidthSupportedText[20];
 	char				portLinkSpeedSupportedText[20];
-	struct              oib_port *oib_port_session = NULL;
+	struct              omgt_port *omgt_port_session = NULL;
+
+	uint8				fanStatus;
 
 	// determine how we've been invoked
 	cmdName = strrchr(argv[0], '/');			// Find last '/' in path
@@ -176,7 +188,6 @@ int main(int argc, char *argv[])
 		switch (c) {
 			case 'D':
 				g_debugMode = 1;
-				oib_set_dbg(stderr);
 				break;
 
 			case 't':
@@ -200,7 +211,6 @@ int main(int argc, char *argv[])
 				break;
 
 			case 'v':
-				oib_set_dbg(stderr);
 				g_verbose = 1;
 				break;
 
@@ -274,20 +284,21 @@ int main(int argc, char *argv[])
 
 	// Get the path
 
-	status = oib_open_port_by_num(&oib_port_session, hfi, port);
+	struct omgt_params params = {.debug_file = (g_verbose || g_debugMode) ? stderr : NULL};
+	status = omgt_open_port_by_num(&omgt_port_session, hfi, port, &params);
 	if (status != 0) {
 		fprintf(stderr, "%s: Error: Unable to open fabric interface.\n", cmdName);
 		exit(1);
 	}
 
-	if (getDestPath(oib_port_session, destPortGuid, cmdName, &path) != FSUCCESS) {
+	if (getDestPath(omgt_port_session, destPortGuid, cmdName, &path) != FSUCCESS) {
 		fprintf(stderr, "%s: Error: Failed to get destination path\n", cmdName);
 		goto err_exit;
 	}
 
 	// Send a ClassPortInfo to see if the switch is responding
 
-	status = sendClassPortInfoMad(oib_port_session, &path, &mad);
+	status = sendClassPortInfoMad(omgt_port_session, &path, &mad);
 	if (status != FSUCCESS) {
 		fprintf(stderr, "%s: Error: Failed to send/rcv ClassPortInfo\n", cmdName);
 		goto err_exit;
@@ -295,7 +306,7 @@ int main(int argc, char *argv[])
 
 	// Get a session ID
 
-	sessionID = getSessionID(oib_port_session, &path);
+	sessionID = getSessionID(omgt_port_session, &path);
 	if (sessionID == (uint16)-1) {
 		fprintf(stderr, "%s: Error: Failed to obtain sessionID\n", cmdName);
 		status = FERROR;
@@ -311,7 +322,7 @@ int main(int argc, char *argv[])
 			break;
 
 		case 2:
-			status = sendRegisterAccessMad(oib_port_session, &path, &mad, sessionID, 
+			status = sendRegisterAccessMad(omgt_port_session, &path, &mad, sessionID, 
 										   (uint8)0x6f, &regValue, 1);
 			if (status != FSUCCESS) {
 				fprintf(stderr, "Error: Failed to access register - status %d\n", status);
@@ -321,7 +332,7 @@ int main(int argc, char *argv[])
 			break;
 
 		case 3:
-			status = getFwVersion(oib_port_session, &path, &mad, sessionID, fwVersion);
+			status = getFwVersion(omgt_port_session, &path, &mad, sessionID, fwVersion);
 			if (status != FSUCCESS) {
 				fprintf(stderr, "Error: Failed to acquire fw version - status %d\n", status);
 				break;
@@ -330,7 +341,7 @@ int main(int argc, char *argv[])
 			break;
 
 		case 4:
-			status = getVPDInfo(oib_port_session, &path, &mad, sessionID, OPASW_MODULE, &vpdInfo);
+			status = getVPDInfo(omgt_port_session, &path, &mad, sessionID, OPASW_MODULE, &vpdInfo);
 			if (status != FSUCCESS) {
 				fprintf(stderr, "Error: Failed to access vpd info - status %d\n", status);
 				break;
@@ -351,7 +362,7 @@ int main(int argc, char *argv[])
 			break;
 
 		case 5:
-			status = getNodeDescription(oib_port_session, &path, sessionID, nodeDesc);
+			status = getNodeDescription(omgt_port_session, &path, sessionID, nodeDesc);
 			if (status != FSUCCESS) {
 				fprintf(stderr, "Error: Failed to acquire node description - status %d\n", status);
 				break;
@@ -359,7 +370,12 @@ int main(int argc, char *argv[])
 			printf("Node description is %s\n", nodeDesc);
 			break;
 		case 6:
-			status = getTempReadings(oib_port_session, &path, &mad, sessionID, tempStrs);
+			status = getBoardID(omgt_port_session, &path, &mad, sessionID, &boardID);
+			if (status != FSUCCESS) {
+				fprintf(stderr, "Error: Failed to get board id - status %d\n", status);
+				break;
+			}
+			status = getTempReadings(omgt_port_session, &path, &mad, sessionID, tempStrs,boardID);
 
 			for (i=0; i<I2C_OPASW_TEMP_SENSOR_COUNT; i++) {
 				printf("SENSOR %d: %s ", i, tempStrs[i]);
@@ -371,8 +387,25 @@ int main(int argc, char *argv[])
 			}
 			break;
 		case 7:
+			status = getBoardID(omgt_port_session, &path, &mad, sessionID, &boardID);
+			if (status != FSUCCESS) {
+				fprintf(stderr, "Error: Failed to get board id - status %d\n", status);
+				break;
+			}
+			if (boardID == STL_BOARD_ID_HPE7K) {
+
+				printf("FAN 0:NOTAVAIL ");
+				printf("FAN 1:NOTAVAIL ");
+				printf("FAN 2:NOTAVAIL ");
+				printf("FAN 3:NOTAVAIL ");
+				printf("FAN 4:NOTAVAIL ");
+				printf("FAN 5:NOTAVAIL ");
+				printf("\n");
+			}
+			else {
+			fanStatus =0;
 			for (i = 0; i < OPASW_PSOC_FAN_CTRL_TACHS; i++) {
-				status = getFanSpeed(oib_port_session, &path, &mad, sessionID,
+				status = getFanSpeed(omgt_port_session, &path, &mad, sessionID,
 									 (uint32)i, &fanSpeed[i]);
 				if (status != FSUCCESS) {
 					fprintf(stderr, "Error: Failed to get fan speed for fan %d - status %d\n", i, status);
@@ -382,18 +415,57 @@ int main(int argc, char *argv[])
 					printf("Fan speed is %d\n", fanSpeed[i]);
 				}
 				// TODO: stl1baseboard.c only reports the speed itself, not FAST/SLOW/NORMAL, so I can't confirm that this matches
-				if (fanSpeed[i] > MAX_FAN_SPEED) 
-					printf("FAN %d:FAST ", i);
-				else if (fanSpeed[i] < MIN_FAN_SPEED)
-					printf("FAN %d:SLOW ", i);
-				else
-					printf("FAN %d:NORMAL ", i);
+				if (fanSpeed[i] == 0 ) {
+					fanStatus |= 1 << i;
+				}
 			}
+			// print results
+			if ((fanStatus & FAN_STATUS_TRAY1) == FAN_STATUS_TRAY1) {
+				printf("FAN 0:NOTPRESENT ");
+				printf("FAN 1:NOTPRESENT ");
+				printf("FAN 2:NOTPRESENT ");
+			}
+			else {
+				for (i=0; i<3; i++) {
+					if (fanSpeed[i] > MAX_FAN_SPEED)
+						printf("FAN %d:FAST ", i);
+					else if (fanSpeed[i] < MIN_FAN_SPEED)
+						printf("FAN %d:SLOW ", i);
+					else
+						printf("FAN %d:NORMAL ", i);
+				}
+			}// end else TRAY1
+			if ((fanStatus & FAN_STATUS_TRAY2) == FAN_STATUS_TRAY2) {
+				printf("FAN 3:NOTPRESENT ");
+				printf("FAN 4:NOTPRESENT ");
+				printf("FAN 5:NOTPRESENT ");
+			}
+			else {
+				for (i=3; i<6; i++) {
+					if (fanSpeed[i] > MAX_FAN_SPEED)
+						printf("FAN %d:FAST ", i);
+					else if (fanSpeed[i] < MIN_FAN_SPEED)
+						printf("FAN %d:SLOW ", i);
+					else
+						printf("FAN %d:NORMAL ", i);
+				}
+			}// end els TRAY2
+
 			printf("\n");
+			}
 			break;
 
 		case 8:
-			status = getPowerSupplyStatus(oib_port_session, &path, &mad, sessionID, g_intParam, 
+			status = getBoardID(omgt_port_session, &path, &mad, sessionID, &boardID);
+			if (status != FSUCCESS) {
+				fprintf(stderr, "Error: Failed to get board id - status %d\n", status);
+				break;
+			}
+			if (boardID == STL_BOARD_ID_HPE7K) {
+					printf("PS %d: N/A\n", g_intParam);
+			}
+			else {
+			status = getPowerSupplyStatus(omgt_port_session, &path, &mad, sessionID, g_intParam, 
 										  &psStatus);
 			if (status != FSUCCESS) {
 				fprintf(stderr, "Error: Failed to get power supply status for ps %d - status %d\n", g_intParam, status);
@@ -416,10 +488,11 @@ int main(int argc, char *argv[])
 					fprintf(stderr, "Error: Failed to get power supply status for ps %d\n", g_intParam); 
 					break;
 			}
+			}
 			break;
 
 		case 9:
-			status = getAsicVersion(oib_port_session, &path, &mad, sessionID, &asicVersion);
+			status = getAsicVersion(omgt_port_session, &path, &mad, sessionID, &asicVersion);
 			if (status != FSUCCESS) {
 				fprintf(stderr, "Error: Failed to get ASIC version - status %d\n", status);
 				break;
@@ -456,19 +529,19 @@ int main(int argc, char *argv[])
 				/* query port 2 */
 				int dest_port_query=1;
 				printf("Switch configuration values\n");
-				status = sendIniDescriptorGetMad(oib_port_session, &path, &mad, sessionID, &tableDescriptors);
+				status = sendIniDescriptorGetMad(omgt_port_session, &path, &mad, sessionID, &tableDescriptors);
 				if (status != FSUCCESS) {
 					fprintf(stderr, "%s: Error: Failed to get ini descriptors - status %d\n", cmdName, status);
 					goto retErr;
 				}
-				numPorts = getNumPorts(oib_port_session, &path, sessionID);
+				numPorts = getNumPorts(omgt_port_session, &path, sessionID);
 
 				if( numPorts <= 0){
 					fprintf(stderr,"error in fetching port records\n");
 					goto retErr;
 				}
 				portEntrySize = tableDescriptors.portDataLen / numPorts;
-				status = sendMemAccessGetMad(oib_port_session, &path, &mad, sessionID, tableDescriptors.portDataAddr + (dest_port_query * portEntrySize), portEntrySize*4, memoryData);
+				status = sendMemAccessGetMad(omgt_port_session, &path, &mad, sessionID, tableDescriptors.portDataAddr + (dest_port_query * portEntrySize), portEntrySize*4, memoryData);
 				if (status != FSUCCESS) {
 					printf("Mem Access MAD Failed \n");
 					goto retErr;
@@ -497,7 +570,7 @@ int main(int argc, char *argv[])
 				portvCUIndex = getMetaDataIndexByField(&portMetaData[0], tableDescriptors.portMetaDataLen, "VCU");
 				portExternalLoopbackAllowedIndex = getMetaDataIndexByField(&portMetaData[0], tableDescriptors.portMetaDataLen, "EXTERNAL_LOOPBACK_ALLOWED");
 
-				status = getNodeDescription(oib_port_session, &path, sessionID, nodeDesc);
+				status = getNodeDescription(omgt_port_session, &path, sessionID, nodeDesc);
 				if (status != FSUCCESS) {
 					fprintf(stderr, "Error: Failed to acquire node description - status %d\n", status);
 					goto retErr;
@@ -520,7 +593,7 @@ retErr:
 				break;
 			}
 		case 12:
-			status = getBoardID(oib_port_session, &path, &mad, sessionID, &boardID);
+			status = getBoardID(omgt_port_session, &path, &mad, sessionID, &boardID);
 			if (status != FSUCCESS) {
 				fprintf(stderr, "Error: Failed to get board id - status %d\n", status);
 				break;
@@ -530,19 +603,17 @@ retErr:
 
 		default:
 			fprintf(stderr, "Error: Invalid query number %d\n", g_queryNum);
-			releaseSession(oib_port_session, &path, sessionID);
+			releaseSession(omgt_port_session, &path, sessionID);
 			usage(cmdName);
 			break;
 	}
 
-	releaseSession(oib_port_session, &path, sessionID);
+	releaseSession(omgt_port_session, &path, sessionID);
 
 	printf("opaswquery completed\n");
 
 err_exit:
-	if (oib_port_session != NULL) {
-		oib_close_port(oib_port_session);
-	}
+	omgt_close_port(omgt_port_session);
 
 	if (status == FSUCCESS)
 		exit(0);

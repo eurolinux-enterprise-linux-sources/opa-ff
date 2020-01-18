@@ -25,10 +25,34 @@
 # CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
+#
 # END_ICS_COPYRIGHT8   ****************************************
 
 # [ICS VERSION STRING: @(#) ./bin/opahfirev 0mwhe.20151019 [10/19/15 15:19]
+function nn_to_sockets()
+{
+#determine socket from the corresponding numa node
+
+	local numa_node="$1"
+	cmdout="$(lscpu -p=SOCKET,NODE 2>&1)"
+
+	#parse output of lscpu
+	while read -r line
+	do
+		if [ "${line:0:1}" == "#" ]
+		then continue
+		fi
+		sktval="${line%%,*}"
+		nodeval="${line##*,}"
+		if [ "${nodeval}" -eq "${numa_node}" ]
+		then
+			echo $sktval 
+			return 0
+		fi
+	done <<< "${cmdout}"
+	return 1
+
+}
 
 Usage()
 {
@@ -62,6 +86,7 @@ else
 		guid="UNKNOWN"
 		tmmver="UNKNOWN"
 		tmm=0
+		instance=""
 
 		localbus_info=$(lspci -vv -s "${hfi}" | 
 			grep LnkSta: | 
@@ -74,13 +99,15 @@ else
 			instance=`ls ${driver} 2>/dev/null`
 		fi
 
-		hfinum=${instance#*_}
-		hfinum=`echo "${hfinum} +1" | bc`
-
-		if [ ! -e ${driver} -o ! -e ${driver}/${instance} ] 
+		if [ -z ${instance} ]	
+		then
+			instance="Driver not Loaded"
+		elif [ ! -e ${driver} -o ! -e ${driver}/${instance} ]
 		then
 			instance="Driver not Loaded"
 		else
+			hfinum=${instance#*_}
+			hfinum=`echo "${hfinum} +1" | bc`
 			eval 2>/dev/null read boardver < ${driver}/${instance}/boardversion
 			eval 2>/dev/null read serial < ${driver}/${instance}/serial
 			eval 2>/dev/null read guid < ${driver}/${instance}/node_guid
@@ -99,26 +126,72 @@ else
 
 			/usr/sbin/opatmmtool -h ${hfinum} 2>/dev/null 1>/dev/null
 			tmm=$?
-			if [ $tmm -ne 3 ]
+			if [ $tmm -eq 0 ]
 			then
 				tmmver=`/usr/sbin/opatmmtool -h ${hfinum} fwversion | sed s/"Current Firmware Version="//`
 			fi
 		fi
 
+		pci_id=`lspci -n -d 0x8086:* | egrep -o -m1 24f[01]`
+		if [ -z "${pci_id}" ]
+		then
+			echo "Error identifying HFI's on the PCI bus">&2
+			type="NA"
+			pci_slot="NA"
+		else
+			if [ "$pci_id" = "24f0" ] 
+			then
+				type="Discrete"
+				pci_slot="${hfi##*:}"
+				pci_slot="${pci_slot%%.*}"
+			else
+				type="Integrated"
+			fi
+		fi
+
+	
+		nn=`cat /sys/bus/pci/devices/$hfi/numa_node`
+		res=$?
+		if [ "${res}" -ne 0 ]
+		then
+			nn="NA"
+			sckt="NA"
+		else
+			sckt=$(nn_to_sockets ${nn})
+			res=$?
+			if [ "${res}" -ne 0 ]
+			then
+				sckt="NA"
+			fi
+		fi
+
+		if [ "${instance}" = "Driver not Loaded" ]
+			then
+				hfi_id="_NA"
+			else
+				hfi_id=${instance#*_}
+		fi
+
 		echo "HFI:   $instance"
 		echo "Board: $boardver"
 		echo "SN:    $serial"
+		if [ "${type}" = "Discrete" ]
+		then
+			echo "Location:$type  Socket:$sckt PCISlot:$pci_slot NUMANode:$nn  HFI$hfi_id"
+		else
+			echo "Location:$type  Socket:$sckt  NUMANode:$nn  HFI$hfi_id"
+		fi
 		echo "Bus:   ${localbus_info}"
 		echo "GUID:  $guid"
-		
+
 		if [ -z $hw_string ]
 		then
-			echo "HWRev: $hw_rev"
+			echo "SiRev: $hw_rev"
 		else
-			echo "HWRev: $hw_string ($hw_rev)"
+			echo "SiRev: $hw_string ($hw_rev)"
 		fi
 
-		if [ $tmm -ne 3 ]
+		if [ $tmm -eq 0 ]
 		then
 			echo "TMM:   $tmmver"
 		fi

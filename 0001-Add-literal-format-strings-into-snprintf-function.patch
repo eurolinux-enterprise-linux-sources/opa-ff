@@ -1,29 +1,15 @@
-From 728985e2fa5ab888fc095f73925d5090472e6a9e Mon Sep 17 00:00:00 2001
+From a956ba489526a7d5287a642878994d8125506c62 Mon Sep 17 00:00:00 2001
 From: Honggang Li <honli@redhat.com>
-Date: Mon, 6 Mar 2017 17:43:06 +0800
+Date: Thu, 19 Oct 2017 18:26:35 +0800
 Subject: [PATCH] Add literal format strings into snprintf function
 
 Signed-off-by: Honggang Li <honli@redhat.com>
 ---
- Esm/ib/src/config/fm_xml.c                          | 2 +-
  Esm/ib/src/linux/startup/fm_config/config_convert.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Esm/ib/src/config/fm_xml.c b/Esm/ib/src/config/fm_xml.c
-index 09907b4..34cdd44 100644
---- a/Esm/ib/src/config/fm_xml.c
-+++ b/Esm/ib/src/config/fm_xml.c
-@@ -3512,7 +3512,7 @@ addDefaultVirtualFabric(uint32_t fm, FMXmlCompositeConfig_t *config, VFXmlConfig
-     vfp->number_of_limited_members = 0;
- 
-     vfp->number_of_applications = 1;
--    snprintf(vfp->application[0].application, sizeof(vfp->application[0].application), app->name);
-+    snprintf(vfp->application[0].application, sizeof(vfp->application[0].application), "%s", app->name);
- 
- 	if (!addMap(&app_config->appMap, XML_QMAP_U64_CAST app)) {
- 		freeApplicationObject(app);
 diff --git a/Esm/ib/src/linux/startup/fm_config/config_convert.c b/Esm/ib/src/linux/startup/fm_config/config_convert.c
-index 01954e6..ffc442d 100644
+index 68ec10a..b8c0069 100644
 --- a/Esm/ib/src/linux/startup/fm_config/config_convert.c
 +++ b/Esm/ib/src/linux/startup/fm_config/config_convert.c
 @@ -541,7 +541,7 @@ char *formatOldValue(Ag_Man_t *sp, OldFormat_t format)
@@ -36,5 +22,5 @@ index 01954e6..ffc442d 100644
      case FORMAT_RATE:
          if (FALSE == getOldUllValue(sp, &value))
 -- 
-1.8.3.1
+2.14.0
 
