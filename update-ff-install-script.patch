@@ -1,0 +1,57 @@
+diff --git a/OpenIb_Host/ff_install.sh b/OpenIb_Host/ff_install.sh
+index 0eb0c70..334ba07 100755
+--- a/OpenIb_Host/ff_install.sh
++++ b/OpenIb_Host/ff_install.sh
+@@ -102,28 +102,12 @@ opasadb_header="opasadb_path.h opasadb_route.h opasadb_route2.h"
+ 
+ opasadb_mans="opa_osd_dump.1 opa_osd_exercise.1 opa_osd_perf.1 opa_osd_query.1"
+ 
+-mpi_apps_files="Makefile mpi_hosts.sample README prepare_run
+-	select_mpi run_bw get_selected_mpi.sh get_mpi_cc.sh
+-	*.params gen_group_hosts gen_mpi_hosts mpi_cleanup
+-	stop_daemons hpl_dat_gen config_hpl2 run_hpl2 run_lat run_pmb run_imb
+-	run_lat2 run_bw2 run_bibw2 run_bcast2 run_app runmyapp mpicheck
+-	run_mpicheck run_deviation run_multibw run_mpi_stress run_osu
+-	run_cabletest run_allhfilatency run_nxnlatbw run_alltoall3 run_bcast3
+-	run_bibw3 run_bw3 run_lat3 run_mbw_mr3 run_multi_lat3 run_batch_script
+-	run_batch_cabletest hpl-count.diff groupstress deviation
+-	hpl-config/HPL.dat-* hpl-config/README"
+-
+-shmem_apps_files="Makefile mpi_hosts.sample prepare_run README select_mpi
+-	run_barrier run_get_bibw run_get_bw run_get_latency run_put_bibw
+-	run_put_bw run_put_latency run_reduce run_hello run_alltoall
+-	run_rand shmem-hello.c"
+-
+ release_string="IntelOPA-Tools-FF.$BUILD_TARGET_OS_ID.$MODULEVERSION"
+ 
+ #rm -rf $RPM_BUILD_ROOT
+ mkdir -p ${DESTDIR}/usr/bin
+ mkdir -p ${DESTDIR}/usr/sbin
+-mkdir -p ${DESTDIR}/usr/lib/opa/{tools,fm_tools,help,samples,src/mpi_apps,src/shmem_apps}
++mkdir -p ${DESTDIR}/usr/lib/opa/{tools,fm_tools,help,samples}
+ mkdir -p ${DESTDIR}$LIBDIR/ibacm
+ mkdir -p ${DESTDIR}/etc/rdma
+ mkdir -p ${DESTDIR}/etc/opa
+@@ -227,22 +211,6 @@ do
+ done
+ cd ..
+ 
+-cd ../src/mpi/mpi_apps
+-tar -xzf mpi_apps.tgz -C ${DESTDIR}/usr/lib/opa/src/mpi_apps/
+-for i in $mpi_apps_files
+-do
+-	echo "/usr/lib/opa/src/mpi_apps/$i" >> ${BUILDDIR}/ff_file.list
+-done
+-cd ../../
+-
+-cd ../src/shmem/shmem_apps
+-tar -xzf shmem_apps.tgz -C ${DESTDIR}/usr/lib/opa/src/shmem_apps/
+-for i in $shmem_apps_files
+-do
+-	echo "/usr/lib/opa/src/shmem_apps/$i" >> ${BUILDDIR}/ff_file.list
+-done
+-cd ../../
+-
+ #Config files
+ cd ../config
+ cp -t ${DESTDIR}/etc/rdma dsap.conf

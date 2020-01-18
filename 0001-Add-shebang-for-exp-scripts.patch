@@ -1,10 +1,16 @@
-From c268866d04e5c3973a42979eb1492c917c62e1c4 Mon Sep 17 00:00:00 2001
+From c842267efaafb6b5ca1c2651f8e6d21887a04691 Mon Sep 17 00:00:00 2001
 From: Honggang Li <honli@redhat.com>
-Date: Thu, 18 Aug 2016 03:46:34 -0400
+Date: Mon, 6 Mar 2017 17:53:38 +0800
 Subject: [PATCH] Add shebang for exp scripts
 
 The shebang '#!/usr/bin/expect -f' will make opa-ff packages require
 expect rpm package.
+
+Following bash script had been applied to fix this issue.
+
+for f in $(find -type f -name '*.exp') ; do
+	sed -e '1 i\#!/usr/bin/expect -f' -i $f
+done
 
 Signed-off-by: Honggang Li <honli@redhat.com>
 ---
@@ -55,7 +61,7 @@ Signed-off-by: Honggang Li <honli@redhat.com>
  44 files changed, 44 insertions(+)
 
 diff --git a/IbaTools/FastFabric/chassis_configure.exp b/IbaTools/FastFabric/chassis_configure.exp
-index e3e69a7..7803946 100644
+index f18397f..e373a46 100644
 --- a/IbaTools/FastFabric/chassis_configure.exp
 +++ b/IbaTools/FastFabric/chassis_configure.exp
 @@ -1,3 +1,4 @@
@@ -64,7 +70,7 @@ index e3e69a7..7803946 100644
  # 
  # Copyright (c) 2015, Intel Corporation
 diff --git a/IbaTools/FastFabric/chassis_fmconfig.exp b/IbaTools/FastFabric/chassis_fmconfig.exp
-index 4ee920f..c1b272c 100755
+index 986d799..3370e4a 100755
 --- a/IbaTools/FastFabric/chassis_fmconfig.exp
 +++ b/IbaTools/FastFabric/chassis_fmconfig.exp
 @@ -1,3 +1,4 @@
@@ -73,7 +79,7 @@ index 4ee920f..c1b272c 100755
  # 
  # Copyright (c) 2015, Intel Corporation
 diff --git a/IbaTools/FastFabric/chassis_fmcontrol.exp b/IbaTools/FastFabric/chassis_fmcontrol.exp
-index 47f36de..335eec0 100755
+index ea3d546..309aa00 100755
 --- a/IbaTools/FastFabric/chassis_fmcontrol.exp
 +++ b/IbaTools/FastFabric/chassis_fmcontrol.exp
 @@ -1,3 +1,4 @@
@@ -82,7 +88,7 @@ index 47f36de..335eec0 100755
  # 
  # Copyright (c) 2015, Intel Corporation
 diff --git a/IbaTools/FastFabric/chassis_fmgetconfig.exp b/IbaTools/FastFabric/chassis_fmgetconfig.exp
-index 60a9064..2c87acd 100755
+index dff298e..e3e7ce1 100755
 --- a/IbaTools/FastFabric/chassis_fmgetconfig.exp
 +++ b/IbaTools/FastFabric/chassis_fmgetconfig.exp
 @@ -1,3 +1,4 @@
@@ -91,7 +97,7 @@ index 60a9064..2c87acd 100755
  # 
  # Copyright (c) 2015, Intel Corporation
 diff --git a/IbaTools/FastFabric/chassis_fmgetsecurityfiles.exp b/IbaTools/FastFabric/chassis_fmgetsecurityfiles.exp
-index db61871..eae5ea8 100755
+index 99c38c1..db133dc 100755
 --- a/IbaTools/FastFabric/chassis_fmgetsecurityfiles.exp
 +++ b/IbaTools/FastFabric/chassis_fmgetsecurityfiles.exp
 @@ -1,3 +1,4 @@
@@ -100,7 +106,7 @@ index db61871..eae5ea8 100755
  # 
  # Copyright (c) 2015, Intel Corporation
 diff --git a/IbaTools/FastFabric/chassis_fmsecurityfiles.exp b/IbaTools/FastFabric/chassis_fmsecurityfiles.exp
-index c8e74c6..e972108 100755
+index b45aff1..f94d626 100755
 --- a/IbaTools/FastFabric/chassis_fmsecurityfiles.exp
 +++ b/IbaTools/FastFabric/chassis_fmsecurityfiles.exp
 @@ -1,3 +1,4 @@
@@ -109,7 +115,7 @@ index c8e74c6..e972108 100755
  # 
  # Copyright (c) 2015, Intel Corporation
 diff --git a/IbaTools/FastFabric/chassis_getconfig.exp b/IbaTools/FastFabric/chassis_getconfig.exp
-index a68c624..d3fd4f6 100644
+index 7454afc..4d7b265 100644
 --- a/IbaTools/FastFabric/chassis_getconfig.exp
 +++ b/IbaTools/FastFabric/chassis_getconfig.exp
 @@ -1,3 +1,4 @@
@@ -118,7 +124,7 @@ index a68c624..d3fd4f6 100644
  # 
  # Copyright (c) 2015, Intel Corporation
 diff --git a/IbaTools/FastFabric/chassis_reboot.exp b/IbaTools/FastFabric/chassis_reboot.exp
-index 234a6d4..fa57efd 100755
+index f59330f..0574cba 100755
 --- a/IbaTools/FastFabric/chassis_reboot.exp
 +++ b/IbaTools/FastFabric/chassis_reboot.exp
 @@ -1,3 +1,4 @@
@@ -127,7 +133,7 @@ index 234a6d4..fa57efd 100755
  # 
  # Copyright (c) 2015, Intel Corporation
 diff --git a/IbaTools/FastFabric/chassis_upgrade.exp b/IbaTools/FastFabric/chassis_upgrade.exp
-index 3b2dc1b..338c55c 100755
+index c255e01..e031313 100755
 --- a/IbaTools/FastFabric/chassis_upgrade.exp
 +++ b/IbaTools/FastFabric/chassis_upgrade.exp
 @@ -1,3 +1,4 @@
@@ -136,7 +142,7 @@ index 3b2dc1b..338c55c 100755
  # 
  # Copyright (c) 2015, Intel Corporation
 diff --git a/IbaTools/FastFabric/configipoib.exp b/IbaTools/FastFabric/configipoib.exp
-index b064ffa..6422590 100755
+index b577700..a77d763 100755
 --- a/IbaTools/FastFabric/configipoib.exp
 +++ b/IbaTools/FastFabric/configipoib.exp
 @@ -1,3 +1,4 @@
@@ -145,7 +151,7 @@ index b064ffa..6422590 100755
  # 
  # Copyright (c) 2015, Intel Corporation
 diff --git a/IbaTools/FastFabric/ff_function.exp b/IbaTools/FastFabric/ff_function.exp
-index 0014170..3322674 100755
+index d934041..c61e6cb 100755
 --- a/IbaTools/FastFabric/ff_function.exp
 +++ b/IbaTools/FastFabric/ff_function.exp
 @@ -1,3 +1,4 @@
@@ -154,7 +160,7 @@ index 0014170..3322674 100755
  # 
  # Copyright (c) 2015, Intel Corporation
 diff --git a/IbaTools/FastFabric/ipoibping.exp b/IbaTools/FastFabric/ipoibping.exp
-index d677d3c..6046382 100755
+index 17b0486..fc48d02 100755
 --- a/IbaTools/FastFabric/ipoibping.exp
 +++ b/IbaTools/FastFabric/ipoibping.exp
 @@ -1,3 +1,4 @@
@@ -163,7 +169,7 @@ index d677d3c..6046382 100755
  # 
  # Copyright (c) 2015, Intel Corporation
 diff --git a/IbaTools/FastFabric/load.exp b/IbaTools/FastFabric/load.exp
-index d7d6379..b362a06 100755
+index 91991e0..14b0ebf 100755
 --- a/IbaTools/FastFabric/load.exp
 +++ b/IbaTools/FastFabric/load.exp
 @@ -1,3 +1,4 @@
@@ -172,7 +178,7 @@ index d7d6379..b362a06 100755
  # 
  # Copyright (c) 2015, Intel Corporation
 diff --git a/IbaTools/FastFabric/mpiperf.exp b/IbaTools/FastFabric/mpiperf.exp
-index ce75a54..bda685c 100755
+index c929c4f..dfee642 100755
 --- a/IbaTools/FastFabric/mpiperf.exp
 +++ b/IbaTools/FastFabric/mpiperf.exp
 @@ -1,3 +1,4 @@
@@ -181,7 +187,7 @@ index ce75a54..bda685c 100755
  # 
  # Copyright (c) 2015, Intel Corporation
 diff --git a/IbaTools/FastFabric/mpiperfdeviation.exp b/IbaTools/FastFabric/mpiperfdeviation.exp
-index c124e5f..3ed1874 100755
+index a7fc679..c6dfc2f 100755
 --- a/IbaTools/FastFabric/mpiperfdeviation.exp
 +++ b/IbaTools/FastFabric/mpiperfdeviation.exp
 @@ -1,3 +1,4 @@
@@ -190,7 +196,7 @@ index c124e5f..3ed1874 100755
  # 
  # Copyright (c) 2015, Intel Corporation
 diff --git a/IbaTools/FastFabric/reboot.exp b/IbaTools/FastFabric/reboot.exp
-index c1c81a3..abe00f2 100755
+index f27b50a..79a32a0 100755
 --- a/IbaTools/FastFabric/reboot.exp
 +++ b/IbaTools/FastFabric/reboot.exp
 @@ -1,3 +1,4 @@
@@ -199,7 +205,7 @@ index c1c81a3..abe00f2 100755
  # 
  # Copyright (c) 2015, Intel Corporation
 diff --git a/IbaTools/FastFabric/sacache.exp b/IbaTools/FastFabric/sacache.exp
-index 6ad6946..00370b6 100755
+index 40a0340..902bd84 100755
 --- a/IbaTools/FastFabric/sacache.exp
 +++ b/IbaTools/FastFabric/sacache.exp
 @@ -1,3 +1,4 @@
@@ -208,7 +214,7 @@ index 6ad6946..00370b6 100755
  # 
  # Copyright (c) 2015, Intel Corporation
 diff --git a/IbaTools/FastFabric/switch_capture.exp b/IbaTools/FastFabric/switch_capture.exp
-index f24f23b..030eb60 100755
+index ed149a3..03a8fb1 100755
 --- a/IbaTools/FastFabric/switch_capture.exp
 +++ b/IbaTools/FastFabric/switch_capture.exp
 @@ -1,3 +1,4 @@
@@ -217,7 +223,7 @@ index f24f23b..030eb60 100755
  # 
  # Copyright (c) 2015, Intel Corporation
 diff --git a/IbaTools/FastFabric/switch_configure.exp b/IbaTools/FastFabric/switch_configure.exp
-index 4e21ffa..e8ed7f8 100644
+index 3516482..91fa0ba 100644
 --- a/IbaTools/FastFabric/switch_configure.exp
 +++ b/IbaTools/FastFabric/switch_configure.exp
 @@ -1,3 +1,4 @@
@@ -226,7 +232,7 @@ index 4e21ffa..e8ed7f8 100644
  # 
  # Copyright (c) 2015, Intel Corporation
 diff --git a/IbaTools/FastFabric/switch_dump.exp b/IbaTools/FastFabric/switch_dump.exp
-index 063bec2..f28d874 100755
+index b567f26..3560ad2 100755
 --- a/IbaTools/FastFabric/switch_dump.exp
 +++ b/IbaTools/FastFabric/switch_dump.exp
 @@ -1,3 +1,4 @@
@@ -235,7 +241,7 @@ index 063bec2..f28d874 100755
  # 
  # Copyright (c) 2015, Intel Corporation
 diff --git a/IbaTools/FastFabric/switch_fwverify.exp b/IbaTools/FastFabric/switch_fwverify.exp
-index f1eae5e..130fccd 100755
+index 6be1ea9..c386431 100755
 --- a/IbaTools/FastFabric/switch_fwverify.exp
 +++ b/IbaTools/FastFabric/switch_fwverify.exp
 @@ -1,3 +1,4 @@
@@ -244,7 +250,7 @@ index f1eae5e..130fccd 100755
  # BEGIN_ICS_COPYRIGHT8 ****************************************
  # 
 diff --git a/IbaTools/FastFabric/switch_getconfig.exp b/IbaTools/FastFabric/switch_getconfig.exp
-index b313eb5..c71a195 100755
+index a1cbaae..8c7812f 100755
 --- a/IbaTools/FastFabric/switch_getconfig.exp
 +++ b/IbaTools/FastFabric/switch_getconfig.exp
 @@ -1,3 +1,4 @@
@@ -253,7 +259,7 @@ index b313eb5..c71a195 100755
  # BEGIN_ICS_COPYRIGHT8 ****************************************
  # 
 diff --git a/IbaTools/FastFabric/switch_hwvpd.exp b/IbaTools/FastFabric/switch_hwvpd.exp
-index 6570226..60cd72f 100755
+index 24fa8a5..e7435fd 100755
 --- a/IbaTools/FastFabric/switch_hwvpd.exp
 +++ b/IbaTools/FastFabric/switch_hwvpd.exp
 @@ -1,3 +1,4 @@
@@ -262,7 +268,7 @@ index 6570226..60cd72f 100755
  # BEGIN_ICS_COPYRIGHT8 ****************************************
  # 
 diff --git a/IbaTools/FastFabric/switch_info.exp b/IbaTools/FastFabric/switch_info.exp
-index abfe292..165cae9 100755
+index 73ef67a..74fd00c 100755
 --- a/IbaTools/FastFabric/switch_info.exp
 +++ b/IbaTools/FastFabric/switch_info.exp
 @@ -1,3 +1,4 @@
@@ -271,7 +277,7 @@ index abfe292..165cae9 100755
  # BEGIN_ICS_COPYRIGHT8 ****************************************
  # 
 diff --git a/IbaTools/FastFabric/switch_ping.exp b/IbaTools/FastFabric/switch_ping.exp
-index 2295eed..7388601 100755
+index 04f060e..dfb6bc7 100755
 --- a/IbaTools/FastFabric/switch_ping.exp
 +++ b/IbaTools/FastFabric/switch_ping.exp
 @@ -1,3 +1,4 @@
@@ -280,7 +286,7 @@ index 2295eed..7388601 100755
  # BEGIN_ICS_COPYRIGHT8 ****************************************
  # 
 diff --git a/IbaTools/FastFabric/switch_reboot.exp b/IbaTools/FastFabric/switch_reboot.exp
-index 68cd0be..a763c97 100755
+index 81f4e3e..ab10142 100755
 --- a/IbaTools/FastFabric/switch_reboot.exp
 +++ b/IbaTools/FastFabric/switch_reboot.exp
 @@ -1,3 +1,4 @@
@@ -289,7 +295,7 @@ index 68cd0be..a763c97 100755
  # 
  # Copyright (c) 2015, Intel Corporation
 diff --git a/IbaTools/FastFabric/switch_upgrade.exp b/IbaTools/FastFabric/switch_upgrade.exp
-index 6c010bb..da9acca 100755
+index 81bd9b4..1f68f37 100755
 --- a/IbaTools/FastFabric/switch_upgrade.exp
 +++ b/IbaTools/FastFabric/switch_upgrade.exp
 @@ -1,3 +1,4 @@
@@ -298,7 +304,7 @@ index 6c010bb..da9acca 100755
  # 
  # Copyright (c) 2015, Intel Corporation
 diff --git a/IbaTools/FastFabric/upgrade.exp b/IbaTools/FastFabric/upgrade.exp
-index 5aaf60e..fcfdfd4 100755
+index aecccbb..85b22c2 100755
 --- a/IbaTools/FastFabric/upgrade.exp
 +++ b/IbaTools/FastFabric/upgrade.exp
 @@ -1,3 +1,4 @@
@@ -307,7 +313,7 @@ index 5aaf60e..fcfdfd4 100755
  # 
  # Copyright (c) 2015, Intel Corporation
 diff --git a/TestTools/basic.exp b/TestTools/basic.exp
-index 939cd69..6ac908d 100755
+index 4ffe1f5..b3362ab 100755
 --- a/TestTools/basic.exp
 +++ b/TestTools/basic.exp
 @@ -1,3 +1,4 @@
@@ -316,7 +322,7 @@ index 939cd69..6ac908d 100755
  # 
  # Copyright (c) 2015, Intel Corporation
 diff --git a/TestTools/chassis.exp b/TestTools/chassis.exp
-index 9ee7184..6bbc00f 100755
+index 9d7a480..36f415e 100755
 --- a/TestTools/chassis.exp
 +++ b/TestTools/chassis.exp
 @@ -1,3 +1,4 @@
@@ -343,7 +349,7 @@ index c9e90e6..b13cdd1 100644
  # 
  # Copyright (c) 2015, Intel Corporation
 diff --git a/TestTools/extmng.exp b/TestTools/extmng.exp
-index e3ffc16..32b4ff0 100755
+index 070b792..98ace84 100755
 --- a/TestTools/extmng.exp
 +++ b/TestTools/extmng.exp
 @@ -1,3 +1,4 @@
@@ -361,7 +367,7 @@ index 06c4a6e..8e949cd 100755
  # 
  # Copyright (c) 2015, Intel Corporation
 diff --git a/TestTools/ibtools.exp b/TestTools/ibtools.exp
-index 6d7e22e..95343e8 100644
+index 36b945c..36bfdbf 100644
 --- a/TestTools/ibtools.exp
 +++ b/TestTools/ibtools.exp
 @@ -1,3 +1,4 @@
@@ -370,7 +376,7 @@ index 6d7e22e..95343e8 100644
  # 
  # Copyright (c) 2015, Intel Corporation
 diff --git a/TestTools/install.exp b/TestTools/install.exp
-index 9590013..9c47e4b 100755
+index b05b709..421e11a 100755
 --- a/TestTools/install.exp
 +++ b/TestTools/install.exp
 @@ -1,3 +1,4 @@
@@ -379,7 +385,7 @@ index 9590013..9c47e4b 100755
  # 
  # Copyright (c) 2015, Intel Corporation
 diff --git a/TestTools/mpi.exp b/TestTools/mpi.exp
-index 120d54e..6112177 100755
+index 54d73bc..5b0ef2d 100755
 --- a/TestTools/mpi.exp
 +++ b/TestTools/mpi.exp
 @@ -1,3 +1,4 @@
@@ -388,7 +394,7 @@ index 120d54e..6112177 100755
  # 
  # Copyright (c) 2015, Intel Corporation
 diff --git a/TestTools/network.exp b/TestTools/network.exp
-index 93a9e2d..356ec16 100755
+index a859022..4a81b14 100755
 --- a/TestTools/network.exp
 +++ b/TestTools/network.exp
 @@ -1,3 +1,4 @@
@@ -397,7 +403,7 @@ index 93a9e2d..356ec16 100755
  # 
  # Copyright (c) 2015, Intel Corporation
 diff --git a/TestTools/opa_to_xml.exp b/TestTools/opa_to_xml.exp
-index 62d28a4..9c71826 100644
+index e5e8ab8..77f8311 100644
 --- a/TestTools/opa_to_xml.exp
 +++ b/TestTools/opa_to_xml.exp
 @@ -1,3 +1,4 @@
@@ -406,7 +412,7 @@ index 62d28a4..9c71826 100644
  # 
  # Copyright (c) 2015, Intel Corporation
 diff --git a/TestTools/proc_mgr.exp b/TestTools/proc_mgr.exp
-index 5dd1dee..3900a00 100755
+index abcb65d..94cb60f 100755
 --- a/TestTools/proc_mgr.exp
 +++ b/TestTools/proc_mgr.exp
 @@ -1,3 +1,4 @@
@@ -415,7 +421,7 @@ index 5dd1dee..3900a00 100755
  # 
  # Copyright (c) 2015, Intel Corporation
 diff --git a/TestTools/sm_control.exp b/TestTools/sm_control.exp
-index 7a778d7..cfbdeec 100755
+index 7f08ccb..bc89ad4 100755
 --- a/TestTools/sm_control.exp
 +++ b/TestTools/sm_control.exp
 @@ -1,3 +1,4 @@
@@ -451,5 +457,5 @@ index 850e789..aa7f825 100755
  # 
  # Copyright (c) 2015, Intel Corporation
 -- 
-2.7.4
+1.8.3.1
 

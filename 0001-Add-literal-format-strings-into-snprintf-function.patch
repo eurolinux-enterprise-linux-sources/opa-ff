@@ -1,19 +1,19 @@
-From ff4647fa2e9eb0f2db6fff39b4fdfd4e0c079d20 Mon Sep 17 00:00:00 2001
+From 728985e2fa5ab888fc095f73925d5090472e6a9e Mon Sep 17 00:00:00 2001
 From: Honggang Li <honli@redhat.com>
-Date: Fri, 27 May 2016 17:24:54 +0800
+Date: Mon, 6 Mar 2017 17:43:06 +0800
 Subject: [PATCH] Add literal format strings into snprintf function
 
 Signed-off-by: Honggang Li <honli@redhat.com>
 ---
- HSM_Lib/ib_library/fm_xml.c | 2 +-
- fm_config/config_convert.c  | 2 +-
+ Esm/ib/src/config/fm_xml.c                          | 2 +-
+ Esm/ib/src/linux/startup/fm_config/config_convert.c | 2 +-
  2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/HSM_Lib/ib_library/fm_xml.c b/HSM_Lib/ib_library/fm_xml.c
-index 7a88953..ea4eb26 100644
---- a/HSM_Lib/ib_library/fm_xml.c
-+++ b/HSM_Lib/ib_library/fm_xml.c
-@@ -3397,7 +3397,7 @@ boolean addDefaultVirtualFabric(uint32_t fm, FMXmlCompositeConfig_t *config, VFX
+diff --git a/Esm/ib/src/config/fm_xml.c b/Esm/ib/src/config/fm_xml.c
+index 09907b4..34cdd44 100644
+--- a/Esm/ib/src/config/fm_xml.c
++++ b/Esm/ib/src/config/fm_xml.c
+@@ -3512,7 +3512,7 @@ addDefaultVirtualFabric(uint32_t fm, FMXmlCompositeConfig_t *config, VFXmlConfig
      vfp->number_of_limited_members = 0;
  
      vfp->number_of_applications = 1;
@@ -22,10 +22,10 @@ index 7a88953..ea4eb26 100644
  
  	if (!addMap(&app_config->appMap, XML_QMAP_U64_CAST app)) {
  		freeApplicationObject(app);
-diff --git a/fm_config/config_convert.c b/fm_config/config_convert.c
+diff --git a/Esm/ib/src/linux/startup/fm_config/config_convert.c b/Esm/ib/src/linux/startup/fm_config/config_convert.c
 index 01954e6..ffc442d 100644
---- a/fm_config/config_convert.c
-+++ b/fm_config/config_convert.c
+--- a/Esm/ib/src/linux/startup/fm_config/config_convert.c
++++ b/Esm/ib/src/linux/startup/fm_config/config_convert.c
 @@ -541,7 +541,7 @@ char *formatOldValue(Ag_Man_t *sp, OldFormat_t format)
      case FORMAT_MTU:
          if (FALSE == getOldUllValue(sp, &value))
@@ -36,5 +36,5 @@ index 01954e6..ffc442d 100644
      case FORMAT_RATE:
          if (FALSE == getOldUllValue(sp, &value))
 -- 
-2.7.4
+1.8.3.1
 
