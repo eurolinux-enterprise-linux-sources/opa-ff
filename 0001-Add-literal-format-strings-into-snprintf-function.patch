@@ -1,0 +1,40 @@
+From ff4647fa2e9eb0f2db6fff39b4fdfd4e0c079d20 Mon Sep 17 00:00:00 2001
+From: Honggang Li <honli@redhat.com>
+Date: Fri, 27 May 2016 17:24:54 +0800
+Subject: [PATCH] Add literal format strings into snprintf function
+
+Signed-off-by: Honggang Li <honli@redhat.com>
+---
+ HSM_Lib/ib_library/fm_xml.c | 2 +-
+ fm_config/config_convert.c  | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/HSM_Lib/ib_library/fm_xml.c b/HSM_Lib/ib_library/fm_xml.c
+index 7a88953..ea4eb26 100644
+--- a/HSM_Lib/ib_library/fm_xml.c
++++ b/HSM_Lib/ib_library/fm_xml.c
+@@ -3397,7 +3397,7 @@ boolean addDefaultVirtualFabric(uint32_t fm, FMXmlCompositeConfig_t *config, VFX
+     vfp->number_of_limited_members = 0;
+ 
+     vfp->number_of_applications = 1;
+-    snprintf(vfp->application[0].application, sizeof(vfp->application[0].application), app->name);
++    snprintf(vfp->application[0].application, sizeof(vfp->application[0].application), "%s", app->name);
+ 
+ 	if (!addMap(&app_config->appMap, XML_QMAP_U64_CAST app)) {
+ 		freeApplicationObject(app);
+diff --git a/fm_config/config_convert.c b/fm_config/config_convert.c
+index 01954e6..ffc442d 100644
+--- a/fm_config/config_convert.c
++++ b/fm_config/config_convert.c
+@@ -541,7 +541,7 @@ char *formatOldValue(Ag_Man_t *sp, OldFormat_t format)
+     case FORMAT_MTU:
+         if (FALSE == getOldUllValue(sp, &value))
+             return (char*)sp->value;
+-        snprintf(buf, 50, IbMTUToText((IB_MTU)value));
++        snprintf(buf, 50, "%s", IbMTUToText((IB_MTU)value));
+         return buf;
+     case FORMAT_RATE:
+         if (FALSE == getOldUllValue(sp, &value))
+-- 
+2.7.4
+

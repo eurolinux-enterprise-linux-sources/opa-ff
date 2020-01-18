@@ -1,0 +1,57 @@
+.\" .\" *********************************************************************
+.\" .\" *                                                                   *
+.\" .\" *             Copyright 2015-2016, Intel Corporation                *
+.\" .\" *                                                                   *
+.\" .\" *                       All Rights Reserved.                        *
+.\" .\" *                                                                   *
+.\" .\" *********************************************************************
+
+.TH opaextractlink 8 "Intel Corporation" "Copyright(C) 2015\-2016" "Master map: IFSFFCLIRG (Man Page)" 
+.SH NAME
+opaextractlink
+
+.NL
+
+.PP
+Produces a CSV file listing all or some of the links in the fabric. opaextractlink is a front end to the opareport tool. The output from this tool can be imported into a spreadsheet or parsed by other scripts.
+.SH Syntax 
+.NL
+opaextractlink [--help] [opareport \fIoptions\fR]
+.SH Options 
+.NL
+
+.TP 10
+--help 
+.NL
+Produces full help text.
+
+.TP 10
+opareport \fIoptions\fR 
+.NL
+Options are passed to opareport. See
+\fIopareport\fR
+for the full set of options.
+
+.SH Examples 
+.NL
+# List all the links in the fabric:
+.br
+opaextractlink
+.br
+
+.br
+# List all the links to a switch named "OmniPth00117501ffffffff":
+.br
+opaextractlink -F "node:OmniPth00117501ffffffff"
+.br
+
+.br
+# List all the links to end-nodes:
+.br
+opaextractlink -F "nodetype:FI"
+.br
+
+.br
+# List all the links on the 2nd HFI\[aq]s fabric of a multi-plane fabric:
+.br
+opaextractlink -h 2

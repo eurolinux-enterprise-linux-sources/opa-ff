@@ -1,0 +1,51 @@
+.\" .\" *********************************************************************
+.\" .\" *                                                                   *
+.\" .\" *             Copyright 2015-2016, Intel Corporation                *
+.\" .\" *                                                                   *
+.\" .\" *                       All Rights Reserved.                        *
+.\" .\" *                                                                   *
+.\" .\" *********************************************************************
+
+.TH opahfirev 1 "Intel Corporation" "Copyright(C) 2015\-2016" "Master map: IFSFFCLIRG (Man Page)" 
+.SH NAME
+opahfirev
+
+.NL
+
+.PP
+
+\fB(Linux)\fR
+Scans the system and reports hardware and firmware information about all the HFIs in the system.
+.SH Syntax
+.NL
+opahfirev 
+.SH Options
+.NL
+
+.TP 10
+no option
+.NL
+Returns information about all of the HFIs in the system.
+
+.TP 10
+--help 
+.NL
+Produces full help text.
+
+.SH Example 
+.NL
+# opahfirev
+.br
+######################
+.br
+server.intel.com#8217#160; - HFI 02:00.0
+.br
+Board:#8217#160;ChipABI 3.0, WFR\(ulID 0x1, ChipRev 7.0 patch 0x00000003, SW Compat 3
+.br
+SN:#8217#160;   0x0057501a
+.br
+Bus:#8217#160;  PCIe,8000MHz,x16
+.br
+GUID:#8217#160; 0011:7501:0157:501a
+.br
+######################

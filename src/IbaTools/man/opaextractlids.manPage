@@ -1,0 +1,51 @@
+.\" .\" *********************************************************************
+.\" .\" *                                                                   *
+.\" .\" *             Copyright 2015-2016, Intel Corporation                *
+.\" .\" *                                                                   *
+.\" .\" *                       All Rights Reserved.                        *
+.\" .\" *                                                                   *
+.\" .\" *********************************************************************
+
+.TH opaextractlids 8 "Intel Corporation" "Copyright(C) 2015\-2016" "Master map: IFSFFCLIRG (Man Page)" 
+.SH NAME
+opaextractlids
+
+.NL
+
+.PP
+Produces a CSV file listing all or some of the LIDs in the fabric. opaextractlids is a front end to the opareport tool. The output from this tool can be imported into a spreadsheet or parsed by other scripts.
+.SH Syntax
+.NL
+opaextractlids [--help] [opareport \fIoptions\fR]
+.SH Options
+.NL
+
+.TP 10
+--help 
+.NL
+Produces full help text.
+
+.TP 10
+opareport \fIoptions\fR 
+.NL
+Options are passed to opareport. See
+\fIopareport\fR
+for the full set of options.
+
+.SH Examples 
+.NL
+# List all the lids in the fabric:
+.br
+opaextractlids
+.br
+
+.br
+# List all the lids of end-nodes:
+.br
+opaextractlids -F "nodetype:FI"
+.br
+
+.br
+# List all the lids on the 2nd HFI\[aq]s fabric of a multi-plane fabric:
+.br
+opaextractlids -h 2

@@ -1,0 +1,345 @@
+.\" .\" *********************************************************************
+.\" .\" *                                                                   *
+.\" .\" *             Copyright 2015-2016, Intel Corporation                *
+.\" .\" *                                                                   *
+.\" .\" *                       All Rights Reserved.                        *
+.\" .\" *                                                                   *
+.\" .\" *********************************************************************
+
+.TH opapmaquery 1 "Intel Corporation" "Copyright(C) 2015\-2016" "Master map: IFSFFCLIRG (Man Page)" 
+.SH NAME
+opapmaquery
+
+.NL
+
+.PP
+
+\fB(All)\fR
+Performs individual PMA queries against a specific LID. It is very useful in displaying port runtime information.
+.SH Syntax 
+.NL
+opapmaquery [-v] [-s \fIsl\fR] [-l \fIlid\fR] [-h \fIhfi\fR] [-p \fIport\fR] [-o \fIotype\fR]
+.br
+[-m \fIport\fR] [-n \fImask\fR] [-e \fImask\fR] [-w \fImask\fR]
+.NL
+
+.SH Options
+.NL
+
+.TP 10
+-v 
+.NL
+Verbose output. Can be specified more than once for additional openib debugging and libibumad debugging.
+
+.TP 10
+-s \fIsl\fR 
+.NL
+Specifies different service level. Default is 0.
+
+.TP 10
+-l \fIlid\fR 
+.NL
+Destination LID. Default is local port.
+
+.TP 10
+-h \fIhfi\fR 
+.NL
+HFI, numbered 1..n. Using 0 specifies that the -p \fIport\fR port is a system-wide port number. Default is 0.
+
+.TP 10
+-p \fIport\fR 
+.NL
+Port, numbered 1..n. If -h \fIhfi\fR is 0, then  \fIport\fR is a system-wide port number. Default is first active port.
+
+.TP 10
+-o \fIotype\fR 
+.NL
+Output type. Default is getportstatus.
+
+.IP
+Valid output types are:
+.RS
+.TP 10
+
+.sp
+classportinfo 
+List of port info records.
+
+.RE
+
+.RS
+.TP 10
+
+.sp
+getportstatus 
+List of port status records.
+
+.IP
+[-m port] [-w vl mask] 
+.RE
+
+.RS
+.TP 10
+
+.sp
+clearportstatus 
+Clears the port status.
+
+.IP
+[-n port mask] [-e counter mask] [-w vl mask] 
+.RE
+
+.RS
+.TP 10
+
+.sp
+getdatacounters 
+List of data counters.
+
+.IP
+[-n port mask] [-w vl mask] 
+.RE
+
+.RS
+.TP 10
+
+.sp
+geterrorcounters 
+List of error counters.
+
+.IP
+[-n port mask] [-w vl mask] 
+.RE
+
+.RS
+.TP 10
+
+.sp
+geterrorinfo 
+List of error info.
+
+.IP
+[-n port mask] 
+.RE
+
+.RS
+.TP 10
+
+.sp
+clearerrorinfo 
+Clears the error info.
+
+.IP
+[-n port mask] [-e counter mask] 
+.RE
+
+.TP 10
+\fB-h and -p options permit a variety of selections:\fR
+.NL
+
+.TP 10
+-h 0 
+.NL
+First active port in system (default).
+
+.TP 10
+-h 0 -p 0 
+.NL
+First active port in system.
+
+.TP 10
+-h \fIx\fR 
+.NL
+First active port on HFI \fIx\fR.
+
+.TP 10
+-h \fIx\fR#8217#160;-p 0 
+.NL
+First active port on HFI \fIx\fR.
+
+.TP 10
+-h 0 -p \fIy\fR 
+.NL
+Port \fIy\fR#8217#160;within system (no matter which ports are active).
+
+.TP 10
+-h \fIx\fR#8217#160;-p \fIy\fR 
+.NL
+HFI \fIx\fR, port \fIy\fR.
+
+.TP 10
+\fBotype options vary by report\fR
+.NL
+
+.TP 10
+-m \fIport\fR 
+.NL
+Port in destination device to query/clear. Required when using -l option for all but -o classportinfo.
+
+.TP 10
+-n \fImask\fR 
+.NL
+Port mask, in hexadecimal. Bits represent ports 63-0. For example: 0x2 for port 1, 0x6 for ports 1, 2.
+
+.TP 10
+-e \fImask\fR 
+.NL
+Counter/error select mask, in hexadecimal. The following lists "Mask - Bit - Location for Counters". Where applicable, location "for Error Info" is presented. The default is all bits set (0xffffffe0).
+
+.RS
+
+.IP \(bu
+0x80000000 - 31 - Transmit Data
+For Error Info: Receive Error Info
+
+.IP \(bu
+0x40000000 - 30 - Receive Data
+For Error Info: Excessive Buffer Overrun
+
+.IP \(bu
+0x20000000 - 29 - Transmit Packets
+For Error Info: Transmit Const Error Info
+
+.IP \(bu
+0x10000000 - 28 - Receive Packets
+For Error Info: Receive Const Error Info
+
+.IP \(bu
+0x08000000 - 27 - Multicast Transmit Packets
+For Error Info: Receive Switch Relay Error Info
+
+.IP \(bu
+0x04000000 - 26 - Multicast Receive Packets
+For Error Info: Uncorrectable Error Info
+
+.IP \(bu
+0x02000000 - 25 - Transmit Wait
+For Error Info: FM Configuration Error Info
+
+.IP \(bu
+0x01000000 - 24 - Congestion Discards
+
+.IP \(bu
+0x00800000 - 23 - Receive FECN
+
+.IP \(bu
+0x00400000 - 22 - Receive BECN
+
+.IP \(bu
+0x00200000 - 21 - Transmit Time Cong.
+
+.IP \(bu
+0x00100000 - 20 - Transmit Time Wasted BW
+
+.IP \(bu
+0x00080000 - 19 - Transmit Time Wait Data
+
+.IP \(bu
+0x00040000 - 18 - Receive Bubble
+
+.IP \(bu
+0x00020000 - 17 - Mark FECN
+
+.IP \(bu
+0x00010000 - 16 - Receive Constraint Errors
+
+.IP \(bu
+0x00008000 - 15 - Receive Switch Relay
+
+.IP \(bu
+0x00004000 - 14 - Transmit Discards
+
+.IP \(bu
+0x00002000 - 13 - Transmit Constraint Errors
+
+.IP \(bu
+0x00001000 - 12 - Receive Remote Physical Errors
+
+.IP \(bu
+0x00000800 - 11 - Local Link Integrity
+
+.IP \(bu
+0x00000400 - 10 - Receive Errors
+
+.IP \(bu
+0x00000200 - 9 - Exc. Buffer Overrun
+
+.IP \(bu
+0x00000100 - 8 - FM Configuration Errors
+
+.IP \(bu
+0x00000080 - 7 - Link Error Recovery
+
+.IP \(bu
+0x00000040 - 6 - Link Error Downed
+
+.IP \(bu
+0x00000020 - 5 - Uncorrectable Errors
+
+
+.RE
+
+.TP 10
+-w \fImask\fR 
+.NL
+Virtual Lane Select Mask, in hexadecimal. Bits represent VL number 31-0. For example, 0x1 for VL 0, 0x3 for VL 0,1. Default is none.
+
+.SH Examples 
+.NL
+opapmaquery -o classportinfo
+.br
+
+.br
+opapmaquery -o getportstatus
+.br
+# get data and error counts, local port
+.br
+
+.br
+opapmaquery -o getdatacounters -n 0x2
+.br
+# get data counts, local port 1
+.br
+
+.br
+opapmaquery -o geterrorcounters -n 0x2
+.br
+# get error counts, local port 1
+.br
+
+.br
+opapmaquery -o clearportstatus -n 0x2
+.br
+# clear all counters local port 1
+.br
+
+.br
+opapmaquery -o geterrorinfo -n 0x2
+.br
+# get error info for local port 1
+.br
+
+.br
+opapmaquery -o clearerrorinfo -n 0x2
+.br
+# clear all error info, local port 1
+.PP
+
+\fBAdditional Examples\fR
+
+.br
+opapmaquery -o getdatacounters -l 6 -n 0x7e -w 0x1
+.br
+# for device at LID 6, get data counters on ports 1-6, inclusive of VL 0 data
+.br
+
+.br
+opapmaquery -o clearportstatus -l 6 -n 0x2 -e 0x1ffff
+.br
+# for device at LID 6, on port 1, clear only error counters
+.br
+
+.br
+opapmaquery -o clearerrorinfo -l 6 -n 0x2 -e 0x04000000
+.br
+# for device at LID 6, on ports 1, clear uncorrectable error info

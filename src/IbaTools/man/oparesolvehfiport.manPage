@@ -1,0 +1,70 @@
+.\" .\" *********************************************************************
+.\" .\" *                                                                   *
+.\" .\" *             Copyright 2015-2016, Intel Corporation                *
+.\" .\" *                                                                   *
+.\" .\" *                       All Rights Reserved.                        *
+.\" .\" *                                                                   *
+.\" .\" *********************************************************************
+
+.TH oparesolvehfiport 1 "Intel Corporation" "Copyright(C) 2015\-2016" "Master map: IFSFFCLIRG (Man Page)" 
+.SH NAME
+oparesolvehfiport
+
+.NL
+
+.PP
+
+\fB(Host)\fR
+Permits the Intel(R) Omni-Path Fabric Host Software style Intel(R) Omni-Path Host Fabric Interface (HFI) number and port number arguments to be converted to a Host Software style HFI name and physical port number.
+.SH Syntax
+.NL
+oparesolvehfiport \fIhfi\fR \fIport\fR
+.SH Options
+.NL
+
+.TP 10
+--help 
+.NL
+Produces full help text.
+
+.TP 10
+ \fIhfi\fR 
+.NL
+HFI to send by. Numbered 1..n. 0 = system-wide port num. Default is first HFI.
+
+.TP 10
+ \fIport\fR 
+.NL
+Port to send by. Numbered 1..n. 0 (default) is first active port.
+
+.TP 10
+\fB-h and -p options permit a variety of selections:\fR
+.NL
+
+.TP 10
+-h 0 -p 0 
+.NL
+First active port in system.
+
+.TP 10
+-h \fIx\fR#8217#160;-p 0 
+.NL
+First active port on HFI \fIx\fR.
+
+.TP 10
+-h 0 -p \fIy\fR 
+.NL
+Port \fIy\fR#8217#160;within system (no matter which ports are active).
+
+.TP 10
+-h \fIx\fR#8217#160;-p \fIy\fR 
+.NL
+HFI \fIx\fR, port \fIy\fR
+
+.SH Examples 
+.NL
+oparesolvehfiport 0 1
+.br
+Output:
+.br
+#8217#160;   hfi\(ul0:1

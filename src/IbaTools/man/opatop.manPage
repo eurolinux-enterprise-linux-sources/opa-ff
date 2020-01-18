@@ -1,0 +1,152 @@
+.\" .\" *********************************************************************
+.\" .\" *                                                                   *
+.\" .\" *             Copyright 2015-2016, Intel Corporation                *
+.\" .\" *                                                                   *
+.\" .\" *                       All Rights Reserved.                        *
+.\" .\" *                                                                   *
+.\" .\" *********************************************************************
+
+.TH opatop 8 "Intel Corporation" "Copyright(C) 2015\-2016" "Master map: IFSFFCLIRG (Man Page)" 
+.SH NAME
+opatop
+
+.NL
+
+.PP
+Starts the opatop Text User Interface (TUI) menu to display performance, congestion, and error information about a fabric. Refer to 
+\fIIntel(R) Omni-Path Fabric Suite FastFabric User Guide\fR
+
+for additional details.
+.SH Syntax
+.NL
+opatop [-v] [-q] [-h \fIhfi\fR] [-p \fIport\fR] [-i \fIseconds\fR]
+.SH Options
+.NL
+
+.SH Options
+.NL
+
+.TP 10
+--help 
+.NL
+Produces full help text.
+
+.TP 10
+-v/--verbose level 
+.NL
+Verbose output level. Value is additive and includes:
+.RS
+.TP 10
+
+.sp
+1 
+Screen
+.RE
+
+.RS
+.TP 10
+
+.sp
+4 
+STDERR opatop
+.RE
+
+.RS
+.TP 10
+
+.sp
+16 
+STDERR PaClient
+.RE
+
+.TP 10
+-q/--quiet 
+.NL
+Disables progress reports.
+.TP 10
+-h/--hfi \fIhfi\fR 
+.NL
+HFI, numbered 1..n. Using 0 specifies that the -p \fIport\fR is a system-wide port number. Default is 0.
+
+.TP 10
+-p/--port \fIport\fR 
+.NL
+List of local HFI ports used to access fabrics for counter clear. Default is first active port. The first HFI in the system is 1. The first port on an HFI is 1.
+
+.IP
+Uses the format hfi:port, for example:
+.RS
+.TP 10
+
+.sp
+0:0 
+First active port in system.
+
+.RE
+
+.RS
+.TP 10
+
+.sp
+0:y 
+Port  \fIy\fR within system.
+
+.RE
+
+.RS
+.TP 10
+
+.sp
+x:0 
+First active port on HFI  \fIx\fR.
+
+.RE
+
+.RS
+.TP 10
+
+.sp
+x:y 
+HFI  \fIx\fR, port  \fIy\fR.
+
+.RE
+
+.TP 10
+-i/--interval \fIseconds\fR 
+.NL
+Interval in  \fIseconds\fR at which PA queries are performed to refresh to the latest PA image. Default = 10 seconds.
+
+.NL
+
+.SH -h and -p options permit a variety of selections:
+.NL
+
+.TP 10
+-h 0 
+.NL
+First active port in system (default).
+
+.TP 10
+-h 0 -p 0 
+.NL
+First active port in system.
+
+.TP 10
+-h \fIx\fR 
+.NL
+First active port on HFI \fIx\fR.
+
+.TP 10
+-h \fIx\fR#8217#160;-p 0 
+.NL
+First active port on HFI \fIx\fR.
+
+.TP 10
+-h 0 -p \fIy\fR 
+.NL
+Port \fIy#8217#160;\fR within system (no matter which ports are active).
+
+.TP 10
+-h \fIx\fR#8217#160;-p \fIy\fR 
+.NL
+HFI \fIx\fR, port \fIy\fR.

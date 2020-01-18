@@ -1,0 +1,61 @@
+.\" .\" *********************************************************************
+.\" .\" *                                                                   *
+.\" .\" *             Copyright 2015-2016, Intel Corporation                *
+.\" .\" *                                                                   *
+.\" .\" *                       All Rights Reserved.                        *
+.\" .\" *                                                                   *
+.\" .\" *********************************************************************
+
+.TH opaextractperf 8 "Intel Corporation" "Copyright(C) 2015\-2016" "Master map: IFSFFCLIRG (Man Page)" 
+.SH NAME
+opaextractperf
+
+.NL
+
+.PP
+Provides a report of all performance counters in a CVS format suitable for importing into a spreadsheet or parsed by other scripts for further analysis. It generates a detailed opareport component summary report and pipes the result to opaxmlextract, extracting element values for NodeDesc, SystemImageGUID, PortNum, and all the performance counters. Extraction is performed only from the Systems portion of the report, which does not contain Neighbor information (the Neighbor and SMs portions are suppressed).
+.SH Syntax
+.NL
+opaextractperf [ \fIopareport options\fR]
+.SH Options
+.NL
+
+.TP 10
+--help 
+.NL
+Produces full help text.
+
+.TP 10
+ \fIopareport options\fR 
+.NL
+ \fIOptions\fR are passed to opareport. See
+\fIopareport\fR
+for the full set of options.
+.PP
+The portion of the script that calls opareport and opaxmlextract follows:
+.PP
+
+.br
+opareport -o comps -s -x -d 10 $@ | opaxmlextract -d \;
+.br
+-e NodeDesc -e SystemImageGUID -e PortNum -e XmitDataMB
+.br
+-e XmitData -e XmitPkts -e RcvDataMB -e RcvData -e RcvPkts
+.br
+-e SymbolErrors -e LinkErrorRecovery -e LinkDowned -e PortRcvErrors
+.br
+-e PortRcvRemotePhysicalErrors -e PortRcvSwitchRelayErrors
+.br
+-e PortXmitDiscards -e PortXmitConstraintErrors
+.br
+-e PortRcvConstraintErrors -e LocalLinkIntegrityErrors
+.br
+-e ExcessiveBufferOverrunErrors -e VL15Dropped -s Neighbor -s SMs
+
+.br
+
+.SH Example
+.NL
+opaextractperf
+.br
+opaextractperf -h 1 -p 2

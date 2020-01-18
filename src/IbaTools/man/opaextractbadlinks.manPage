@@ -1,0 +1,55 @@
+.\" .\" *********************************************************************
+.\" .\" *                                                                   *
+.\" .\" *             Copyright 2015-2016, Intel Corporation                *
+.\" .\" *                                                                   *
+.\" .\" *                       All Rights Reserved.                        *
+.\" .\" *                                                                   *
+.\" .\" *********************************************************************
+
+.TH opaextractbadlinks 8 "Intel Corporation" "Copyright(C) 2015\-2016" "Master map: IFSFFCLIRG (Man Page)" 
+.SH NAME
+opaextractbadlinks
+
+.NL
+
+.PP
+Produces a CSV file listing all or some of the links that exceed opareport -o error thresholds. opaextractbadlinks is a front end to the opareport tool. The output from this tool can be imported into a spreadsheet or parsed by other scripts.
+.SH Syntax 
+.NL
+opaextractbadlinks [--help] [opareport \fIoptions\fR]
+.SH Options 
+.NL
+
+.TP 10
+opareport \fIoptions\fR 
+.NL
+Options are passed to opareport. See
+\fIopareport\fR
+for the full set of options.
+
+.SH Examples 
+.NL
+# List all the bad links in the fabric:
+.br
+opaextractbadlinks
+.br
+
+.br
+# List all the bad links to a switch named "OmniPth00117501ffffffff":
+.br
+opaextractbadlinks -F "node:OmniPth00117501ffffffff"
+.br
+
+.br
+# List all the bad links to end-nodes:
+.br
+opaextractbadlinks -F "nodetype:FI"
+.br
+
+.br
+# List all the bad links on the 2nd HFI\[aq]s fabric of a multi-plane fabric:
+.br
+opaextractbadlinks -h 2
+.br
+
+.br
