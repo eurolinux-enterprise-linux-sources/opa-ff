@@ -6,7 +6,7 @@
 .\" .\" *                                                                   *
 .\" .\" *********************************************************************
 
-.TH opapingall 8 "Intel Corporation" "Copyright(C) 2015\-2018" "Master map: IFSFFCLIRG (Man Page)" 
+.TH opapingall 8 "Intel Corporation" "Copyright(C) 2015\-2018" "IFSFFCLIRG (Man Page)" 
 .SH NAME
 opapingall
 
@@ -32,7 +32,7 @@ Produces full help text.
 .TP 10
 -C 
 .NL
-Performs a ping against a chassis. The default is hosts.
+Performs a ping against a chassis. Default is hosts.
 
 .TP 10
 -p 

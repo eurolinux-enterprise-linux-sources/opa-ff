@@ -6,7 +6,7 @@
 .\" .\" *                                                                   *
 .\" .\" *********************************************************************
 
-.TH opafindgood 8 "Intel Corporation" "Copyright(C) 2015\-2018" "Master map: IFSFFCLIRG (Man Page)" 
+.TH opafindgood 8 "Intel Corporation" "Copyright(C) 2015\-2018" "IFSFFCLIRG (Man Page)" 
 .SH NAME
 opafindgood
 
@@ -151,7 +151,7 @@ HFI \fIx\fR, port \fIy\fR.
 .TP 10
 -T \fItimelimit\fR 
 .NL
-Specifies the time limit in seconds for host to respond to SSH. Default = 20 seconds.
+Specifies the time limit in seconds for host to respond to SSH. Default is 20 seconds.
 
 .SH Environment Variables
 .NL

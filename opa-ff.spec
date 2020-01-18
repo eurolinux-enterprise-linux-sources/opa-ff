@@ -1,6 +1,6 @@
 Name:    opa-ff
-Epoch: 1
-Version: 10.7.0.0.133
+Epoch:   1
+Version: 10.9.0.0.204
 Release: 1%{?dist}
 Summary: Intel Omni-Path basic tools and libraries for fabric management
 License: BSD or GPLv2
@@ -9,14 +9,16 @@ Url: https://github.com/01org/opa-ff
 # git clone https://github.com/01org/opa-ff.git
 # cd opa-ff
 # git archive --format=tar --prefix=opa-ff-%{version}/ \
-# c6b993a4c724f7f3dd3f62a8a5371b0d170b7334 | xz > opa-ff-%{version}.tar.xz
+# 46667698b2f2316beb5de3d5183f76bafcf11bf0 | xz > opa-ff-%{version}.tar.xz
 Source: %{name}-%{version}.tar.xz
+Source2:	opa-ff.ini
 
-Patch0005: 0001-Add-literal-format-strings-into-snprintf-function.patch
+Patch0005: 0001-Fix-shebang-for-python-scripts.patch
 Patch0006: 0001-Add-shebang-for-exp-scripts.patch
 Patch0007: update-ff-install-script.patch
+Patch8:	opa-ff_add_dist_to_list.patch
 
-BuildRequires: gcc-c++
+BuildRequires: gcc-c++, gcc, python
 BuildRequires: openssl-devel, tcl-devel, ncurses-devel
 BuildRequires: libibumad-devel, rdma-core-devel, libibmad-devel, ibacm-devel, expat-devel
 BuildRequires: perl
@@ -53,6 +55,13 @@ Requires: opa-basic-tools%{?_isa}
 %description -n opa-fastfabric
 Contains tools for managing fabric on a management node.
 
+%package -n opa-snapconfig
+Summary: Configure fabric with snapshot file
+Requires: opa-fastfabric%{?_isa}
+
+%description -n opa-snapconfig
+Parse information from provided snapshot file and issue packets to program.
+
 %package -n opa-libopamgt
 Summary: Omni-Path management API library
 Requires: libibumad
@@ -73,6 +82,7 @@ This package contains the necessary headers for opamgt development.
 %patch0005 -p1
 %patch0006 -p1
 %patch0007 -p1
+%patch8 -p1
 
 find . -type f -name '*.[ch]' -exec 'chmod' 'a-x' '{}' ';'
 find . -type f -name '*.exp'  -exec 'chmod' 'a+x' '{}' ';'
@@ -87,7 +97,7 @@ export release_COPT_Flags='%{optflags}'
 export release_CCOPT_Flags='%{optflags}'
 
 cd OpenIb_Host
-./ff_build.sh %{_builddir} $BUILD_ARGS
+OPA_FEATURE_SET= ./ff_build.sh %{_builddir} $BUILD_ARGS
 
 
 %install
@@ -116,10 +126,8 @@ BUILDDIR=%{_builddir} DESTDIR=%{buildroot} LIBDIR=%{_libdir} DSAP_LIBDIR=%{_libd
 %{_prefix}/lib/opa/tools/setup_self_ssh
 %{_prefix}/lib/opa/tools/usemem
 %{_prefix}/lib/opa/tools/opaipcalc
-%{_prefix}/lib/opa/.comp_fastfabric.pl
-%{_prefix}/lib/opa/.comp_oftools.pl
+%{_prefix}/lib/opa/tools/stream
 %{_mandir}/man1/opacapture.1.gz
-%{_mandir}/man1/opaconfig.1.gz
 %{_mandir}/man1/opafabricinfo.1.gz
 %{_mandir}/man1/opagetvf.1.gz
 %{_mandir}/man1/opagetvf_env.1.gz
@@ -372,14 +380,21 @@ BUILDDIR=%{_builddir} DESTDIR=%{buildroot} LIBDIR=%{_libdir} DSAP_LIBDIR=%{_libd
 %{_bindir}/opa_osd_exercise
 %{_bindir}/opa_osd_perf
 %{_bindir}/opa_osd_query
+%{_bindir}/opa_osd_load
+%{_bindir}/opa_osd_query_many
 %{_libdir}/ibacm
-%{_libdir}/libopasadb.so.*
+%{_libdir}/libopasadb.so*
 %{_includedir}/infiniband
 %{_mandir}/man1/opa_osd_dump.1*
 %{_mandir}/man1/opa_osd_exercise.1*
 %{_mandir}/man1/opa_osd_perf.1*
 %{_mandir}/man1/opa_osd_query.1*
 %config(noreplace) %{_sysconfdir}/rdma/dsap.conf
+%config(noreplace) %{_sysconfdir}/rdma/op_path_rec.conf
+%config(noreplace) %{_sysconfdir}/rdma/opasadb.xml
+
+%files -n opa-snapconfig
+%{_prefix}/lib/opa/tools/opasnapconfig
 
 %files -n opa-libopamgt
 %{_prefix}/lib/libopamgt.*
@@ -390,6 +405,16 @@ BUILDDIR=%{_builddir} DESTDIR=%{buildroot} LIBDIR=%{_libdir} DSAP_LIBDIR=%{_libd
 
 
 %changelog
+* Thu Aug 08 2019 Scientific Linux Auto Patch Process <SCIENTIFIC-LINUX-DEVEL@LISTSERV.FNAL.GOV>
+- Added Source: opa-ff.ini
+-->  Config file for automated patch script
+- Added Patch: opa-ff_add_dist_to_list.patch
+-->  Detect SL is an EL
+
+* Wed Jan 30 2019 Honggang Li <honli@redhat.com> - 10.9.0.0.204-1
+- Rebase to upstream release v10.9.0.0.204
+- Resolves: bz1637239
+
 * Thu Apr 19 2018 Honggang Li <honli@redhat.com> - 10.7.0.0.133-1
 - Rebase to upstream release v10.7.0.0.133
 - Delete opapacketcapture

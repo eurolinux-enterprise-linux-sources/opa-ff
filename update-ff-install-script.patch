@@ -1,6 +1,6 @@
-From 9af7f4f3214d9448fbbbc253dda11000732b3aed Mon Sep 17 00:00:00 2001
+From bca4e4cdbc4ae54324569e90117924f567e7e77a Mon Sep 17 00:00:00 2001
 From: Honggang Li <honli@redhat.com>
-Date: Thu, 19 Apr 2018 11:43:34 +0800
+Date: Wed, 30 Jan 2019 02:34:38 -0500
 Subject: [PATCH] update ff-install script
 
 Signed-off-by: Honggang Li <honli@redhat.com>
@@ -10,7 +10,7 @@ Signed-off-by: Honggang Li <honli@redhat.com>
  2 files changed, 2 insertions(+), 29 deletions(-)
 
 diff --git a/OpenIb_Host/ff_filegroups.sh b/OpenIb_Host/ff_filegroups.sh
-index 225a63cbea0c..aa5d6280749b 100644
+index cda92ca..d8884ee 100644
 --- a/OpenIb_Host/ff_filegroups.sh
 +++ b/OpenIb_Host/ff_filegroups.sh
 @@ -1,5 +1,5 @@
@@ -20,37 +20,38 @@ index 225a63cbea0c..aa5d6280749b 100644
  	opainfo"
  
  basic_tools_sbin_sym="opapmaquery opaportconfig"
-@@ -9,7 +9,7 @@ basic_tools_opt="setup_self_ssh usemem opaipcalc"
- basic_lib_opa_opt=".comp_fastfabric.pl .comp_oftools.pl"
+@@ -7,7 +7,7 @@ basic_tools_sbin_sym="opapmaquery opaportconfig"
+ basic_tools_opt="setup_self_ssh usemem opaipcalc stream"
  
- basic_mans="opacapture.1 opaconfig.1 opafabricinfo.1 opagetvf.1
+ basic_mans="opacapture.1 opafabricinfo.1 opagetvf.1
 -	opagetvf_env.1 opahfirev.1 opainfo.1 opapacketcapture.1 opapmaquery.1
 +	opagetvf_env.1 opahfirev.1 opainfo.1 opapmaquery.1
  	opaportconfig.1 opaportinfo.1 oparesolvehfiport.1 opasaquery.1
  	opasmaquery.1"
  
-@@ -92,19 +92,3 @@ opamgt_iba_headers="ib_mad.h ib_sa_records.h ib_sd.h ib_sm_types.h
- opamgt_iba_public_headers="datatypes.h datatypes_osd.h ibyteswap.h ibyteswap_osd.h
+@@ -91,20 +91,4 @@ opamgt_iba_public_headers="datatypes.h datatypes_osd.h ibyteswap.h ibyteswap_osd
  	ilist.h imath.h imemory.h imemory_osd.h ipackoff.h ipackon.h ispinlock.h
  	ispinlock_osd.h statustext.h iethernet.h"
--
+ 
 -opamgt_examples="paquery.c saquery.c simple_sa_query.c simple_sa_notice.c simple_pa_query.c
 -	job_schedule.c show_switch_cost_matrix.c Makefile README"
 -
 -mpi_apps_files="Makefile mpi_hosts.sample README prepare_run select_mpi run_bw
 -	get_selected_mpi.sh get_mpi_cc.sh *.params gen_group_hosts gen_mpi_hosts
--	mpi_cleanup stop_daemons hpl_dat_gen config_hpl2 run_hpl2 run_lat run_pmb run_imb run_lat2
+-	mpi_cleanup stop_daemons hpl_dat_gen config_hpl2 run_hpl2 run_lat run_imb run_lat2
 -	run_bw2 run_bibw2 run_bcast2 run_app runmyapp mpicheck run_mpicheck run_deviation
 -	run_multibw run_mpi_stress run_osu run_cabletest run_allhfilatency run_nxnlatbw
 -	run_alltoall3 run_bcast3 run_bibw3 run_bw3 run_lat3 run_mbw_mr3 run_multi_lat3
 -	run_batch_script run_batch_cabletest hpl-count.diff groupstress deviation
--	hpl-config/HPL.dat-* hpl-config/README"
+-	hpl-config/HPL.dat-* hpl-config/README mpicc mpif77"
 -
 -shmem_apps_files="Makefile mpi_hosts.sample prepare_run README select_mpi run_barrier
 -	run_get_bibw run_get_bw run_get_latency run_put_bibw run_put_bw run_put_latency
 -	run_reduce run_hello run_alltoall shmem-hello.c"
+-
+ opasnapconfig_bin="opasnapconfig"
 diff --git a/OpenIb_Host/ff_install.sh b/OpenIb_Host/ff_install.sh
-index ae86a899ad27..412be5812108 100755
+index 341079a..2579a9d 100755
 --- a/OpenIb_Host/ff_install.sh
 +++ b/OpenIb_Host/ff_install.sh
 @@ -28,10 +28,8 @@ mkdir -p ${DESTDIR}/etc/rdma
@@ -62,9 +63,9 @@ index ae86a899ad27..412be5812108 100755
  mkdir -p ${DESTDIR}/usr/share/man/man8
 -mkdir -p ${DESTDIR}/usr/src/opa/{mpi_apps,shmem_apps}
  
- # Copy the comp.pl file before changing directories
- cp -t ${DESTDIR}/usr/lib/opa OpenIb_Host/.comp_fastfabric.pl
-@@ -55,7 +53,6 @@ cd ../opamgt
+ #Binaries and scripts installing (basic tools)
+ #cd builtbin.OPENIB_FF.release
+@@ -51,7 +49,6 @@ cd ../opamgt
  cp -t ${DESTDIR}/usr/include/opamgt $opamgt_headers
  cp -t ${DESTDIR}/usr/include/opamgt/iba $opamgt_iba_headers
  cp -t ${DESTDIR}/usr/include/opamgt/iba/public $opamgt_iba_public_headers
@@ -72,7 +73,7 @@ index ae86a899ad27..412be5812108 100755
  
  OPAMGT_VERNO_MAJOR=$(cat version | cut -d . -f 1)
  
-@@ -91,14 +88,6 @@ cd ../man8
+@@ -88,14 +85,6 @@ cd ../man8
  cp -t ${DESTDIR}/usr/share/man/man8 $ff_mans
  cd ..
  
@@ -88,5 +89,5 @@ index ae86a899ad27..412be5812108 100755
  cd ../config
  cp -t ${DESTDIR}/etc/rdma dsap.conf
 -- 
-2.15.0-rc1
+2.20.1
 
